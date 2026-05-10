@@ -1,0 +1,46 @@
+---
+description: Dr. Segal professional software guidelines + post-change review checklist
+alwaysApply: true
+---
+
+# Project standards (Segal guidelines)
+
+Use this as the default bar for design, docs, and code. Source: course PDF “Guidelines for Writing Professional Software…” (orchestrate AI like a senior architect; docs before vibe-coding).
+
+## Process (before and during work)
+
+1. **Docs first**: `docs/PRD.md` → `docs/PLAN.md` → `docs/TODO.md`; add `docs/PRD_<mechanism>.md` for non-trivial algorithms or central subsystems. Do not treat root-level PLAN/TODO as a substitute unless the team explicitly keeps them in sync with `docs/`.
+2. **Gate**: agree on PRD/plan/tasks (and any extra PRDs) **before** substantial implementation.
+3. **While coding**: keep `docs/TODO.md` truthful; keep root **`README.md`** current (install, usage, config, examples, contributing, license/credits as they exist).
+
+## Repository shape (target)
+
+- **`src/`** package layout (SDK entry, services, shared helpers e.g. gatekeeper/config/version), **`tests/`** (`unit/`, `integration/`), **`docs/`**, **`config/`**, `data/`, `results/`, `assets/`, `notebooks/` as needed.
+- **`pyproject.toml`** + **`uv.lock`**; use **`uv`** for sync/add/run (avoid ad-hoc `pip` / bare `python` in project instructions and automation).
+- **`.envexample`** committed; **`.env`** and secrets gitignored; **no API keys or passwords in source.**
+
+## Code rules
+
+- **File size**: no Python module **> 150 lines** (count includes code, comments, and blank lines). If growth approaches the limit, **split** into additional modules (helpers, mixins, `constants.py`, models)—do not “compress” logic just to fit.
+- **Architecture**: **SDK** is the single entry for business logic; CLI/GUI/HTTP adapters stay thin and call the SDK.
+- **OOP**: avoid duplicated logic; prefer shared modules, bases, or small mixins (one concern per mixin; testable).
+- **External APIs**: all outbound API calls go through a **central gatekeeper** (rate limits from **config JSON**, queue/backpressure, retries/logging as designed)—never one-off unbounded calls beside it.
+- **Config & versions**: tunables and limits live in **`config/`** (or equivalent), not hardcoded; track **version** consistently (e.g. start at `1.00` in code + config where the PDF requires it) and validate on startup if the project defines that.
+- **Comments**: explain **why**, not **what**; **docstrings** on public functions/classes/modules as appropriate; clear names, **SRP**, **DRY**.
+
+## Quality gate
+
+- **TDD** mindset: red → green → refactor; tests alongside behavior.
+- **Coverage**: aim **≥ 85%** on meaningful code; test files also respect the **150-line** rule (split tests).
+- **Lint**: **Ruff** clean per `pyproject.toml` (project standard—keep it zero-waiver unless explicitly documented).
+
+## After big changes (quick review)
+
+Skim and confirm:
+
+- [ ] `docs/TODO.md` and **`README.md`** reflect reality.
+- [ ] No file **> 150 lines** without a deliberate split; new modules have clear names.
+- [ ] Business logic still reachable via **SDK**; no new “secret” API paths bypassing the **gatekeeper**.
+- [ ] No secrets in repo; **`.envexample`** updated if new env vars exist.
+- [ ] **`uv lock`** / deps consistent if dependencies changed; **`uv run`** paths for tests still work.
+- [ ] Tests + coverage + Ruff still pass at project standard.

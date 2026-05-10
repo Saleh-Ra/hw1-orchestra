@@ -21,11 +21,30 @@ For the first implementation, use these defaults:
 - Default window size: `10` samples
 - Default frequencies: `[1, 3, 5, 7]`
 - Default loss function: Mean Squared Error
-- Default model comparison: fully connected network vs. simple RNN vs. LSTM
-- Default dataset strategy: generate synthetic data programmatically, with optional saving later if useful
-- Default experiment control: use config files so we can vary noise, model size, layers, window size, and split ratio without rewriting code
+- First model target: fully connected network only
+- Later model comparison: fully connected network vs. simple RNN vs. LSTM
+- Default dataset strategy: generate many random synthetic signal sets programmatically, with optional saving later if useful
+- Default number of signal sets for the first real baseline: `50`, adjustable downward if runtime is too high
+- Default experiment control: start with simple code defaults, then move to config files after the ML pipeline works
 
 These decisions are allowed to change later if results show a better direction.
+
+## 2.1 Minimal Working Pipeline First
+
+The first implementation should prove the ML task before building the full project infrastructure.
+
+Initial work order:
+
+1. Generate signals.
+2. Build the fully connected dataset.
+3. Train one simple fully connected network.
+4. Verify that the model can reconstruct requested clean signal windows.
+5. Plot predictions.
+6. Add the simple RNN only after the FC baseline works.
+7. Add the LSTM only after the RNN works.
+8. Add config polish and broader experiment automation after the core ML pipeline works.
+
+This avoids spending most of the project time on infrastructure before validating the reconstruction task.
 
 ## 3. Expected Learning Task
 
@@ -101,6 +120,8 @@ Notes:
 
 ## 5. Configuration Plan
 
+Configuration is useful, but it should not block the first ML result. The first FC pipeline may use clear code defaults. Move those defaults into config files after the FC reconstruction loop works.
+
 Create `config/default.json` for stable defaults:
 
 - Frequencies
@@ -125,7 +146,7 @@ Create `config/experiments.json` for experiment variants:
 - Different window sizes
 - Optional train/test split variants such as `70/30`, `80/20`, and `90/10`
 
-The first working run should use the default config only. Experiment variants can come after the baseline pipeline works.
+The first working run should avoid heavy config polish. Experiment variants can come after the baseline pipeline works.
 
 ## 6. Implementation Phases
 
@@ -211,6 +232,9 @@ Dataset behavior:
 - For each valid window position, create examples for all four target signals.
 - With `10000` samples and a window size of `10`, there are `9991` possible window positions if the last start index is included.
 - With four condition vectors, one generated signal set can produce `9991 * 4 = 39964` training examples.
+- The baseline should use many generated signal sets, not just one, so the model sees different amplitudes, phases, and noise patterns.
+- With `50` generated signal sets, the maximum FC dataset size is `50 * 9991 * 4 = 1998200` examples.
+- If memory becomes a problem, implement lazy indexing instead of materializing every example as a large array.
 
 Target behavior:
 
@@ -277,7 +301,7 @@ Acceptance criteria:
 
 Goals:
 
-- Implement three model architectures with consistent outputs.
+- Implement model architectures in sequence, starting with the fully connected baseline.
 
 Implementation file:
 
@@ -288,6 +312,12 @@ Models:
 - `FullyConnectedSignalNet`
 - `RnnSignalNet`
 - `LstmSignalNet`
+
+Implementation order:
+
+1. Implement and validate `FullyConnectedSignalNet`.
+2. Add `RnnSignalNet` only after the FC baseline trains and produces prediction plots.
+3. Add `LstmSignalNet` only after the RNN baseline trains and can be compared.
 
 Fully connected model:
 
@@ -320,7 +350,8 @@ Acceptance criteria:
 
 - Each model produces output shape `(batch_size, 10)`.
 - Unit tests verify model forward passes with fake tensors.
-- Model creation is driven by config values.
+- The FC model works before RNN/LSTM implementation begins.
+- Model creation can start with simple code defaults and move to config values later.
 
 ### Phase 6: Training Loop
 
@@ -354,8 +385,8 @@ Acceptance criteria:
 
 - A tiny smoke training run completes quickly.
 - Loss history contains one value per epoch.
-- Training works for all three model types.
-- Integration test trains each model for a very small number of epochs and confirms no crash.
+- Training first works for the FC model.
+- RNN and LSTM training smoke tests are added later with their models.
 
 ### Phase 7: Evaluation
 
@@ -527,16 +558,21 @@ Coverage goal:
 
 ## 8. Experiment Plan
 
-Start with a baseline experiment:
+Start with a minimal FC baseline experiment:
 
 - Frequencies: `[1, 3, 5, 7]`
 - Samples: `10000`
 - Sampling frequency: `1000 Hz`
 - Window size: `10`
+- Generated signal sets: target `50`, with smaller counts allowed for early debugging
 - Split: `80/20`
-- Models: FC, RNN, LSTM
-- Same dataset for all models
-- Same number of epochs where practical
+- Model: FC only
+
+After the FC baseline works:
+
+- Add RNN on the same dataset.
+- Add LSTM on the same dataset.
+- Compare FC, RNN, and LSTM using the same split and similar training settings where practical.
 
 Then run controlled variants:
 
@@ -598,24 +634,29 @@ Mitigation:
 
 Follow this order:
 
-1. Create project setup and package structure.
-2. Add config loading.
-3. Implement signal generation.
+1. Create minimal project setup and package structure.
+2. Implement signal generation with random amplitudes, phases, and noise.
+3. Generate many random signal sets, starting small and scaling toward `50`.
 4. Test signal generation.
-5. Implement sliding-window dataset.
-6. Test dataset indexing and shapes.
-7. Implement FC, RNN, and LSTM models.
-8. Test model forward passes.
-9. Implement training loop.
-10. Add smoke training tests.
-11. Implement evaluation metrics.
-12. Implement plotting utilities.
-13. Implement baseline experiment runner.
-14. Run baseline experiment.
-15. Save figures and metrics.
-16. Update README with real results.
-17. Add experiment variants.
-18. Update conclusions after comparing results.
+5. Implement the fully connected sliding-window dataset.
+6. Test FC dataset indexing, one-hot mapping, and shapes.
+7. Implement one simple FC model.
+8. Test the FC model forward pass.
+9. Implement a minimal FC training loop.
+10. Run an FC overfit test on a tiny subset.
+11. Train the first real FC baseline.
+12. Plot FC predictions and loss curves.
+13. Review whether FC reconstruction is working.
+14. Add the sequence dataset format.
+15. Add the simple RNN.
+16. Train and plot the RNN.
+17. Review RNN performance.
+18. Add the LSTM.
+19. Train and plot the LSTM.
+20. Compare FC, RNN, and LSTM.
+21. Add config loading and experiment polish.
+22. Add controlled experiment variants.
+23. Update README with real results and conclusions.
 
 ## 11. Definition Of Done
 

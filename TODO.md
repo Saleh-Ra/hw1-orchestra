@@ -12,20 +12,25 @@ Start with a minimal working ML pipeline first. Do not build all infrastructure 
 
 ## Milestone 0: Planning Alignment
 
-- [ ] Re-read `REQUIREMENTS.md`.
-- [ ] Re-read `PLAN.md`.
-- [ ] Confirm that the first implementation target is a minimal working pipeline.
-- [ ] Confirm that the first trained model will be a fully connected network only.
-- [ ] Confirm that RNN will be added after the FC model works.
-- [ ] Confirm that LSTM will be added after the RNN works.
-- [ ] Confirm that experiment/config polish comes after the ML pipeline works.
-- [ ] Update `PLAN.md` to explicitly prioritize the minimal working pipeline.
-- [ ] Update `PLAN.md` to say the baseline should use many generated signal sets.
-- [ ] Update `PLAN.md` to avoid presenting one generated signal set as the final baseline.
-- [ ] Add a short note that `1, 3, 5, 7 Hz` are initial chosen frequencies, not a hard theoretical limit.
-- [ ] Add a short note that dataset size can grow by generating more random signal sets.
-- [ ] Decide whether to keep `code.py` or replace it with the package layout.
-- [ ] Decide whether to keep docs at root for now or move later into `docs/`.
+- [x] Re-read `REQUIREMENTS.md`.
+- [x] Re-read `PLAN.md`.
+- [x] Confirm that the first implementation target is a minimal working pipeline.
+- [x] Confirm that the first trained model will be a fully connected network only.
+- [x] Confirm that RNN will be added after the FC model works.
+- [x] Confirm that LSTM will be added after the RNN works.
+- [x] Confirm that experiment/config polish comes after the ML pipeline works.
+- [x] Update `PLAN.md` to explicitly prioritize the minimal working pipeline.
+- [x] Update `PLAN.md` to say the baseline should use many generated signal sets.
+- [x] Update `PLAN.md` to avoid presenting one generated signal set as the final baseline.
+- [x] Add a short note that `1, 3, 5, 7 Hz` are initial chosen frequencies, not a hard theoretical limit.
+- [x] Add a short note that dataset size can grow by generating more random signal sets.
+- [x] Decide whether to keep `code.py` or replace it with the package layout.
+- [x] Decide whether to keep docs at root for now or move later into `docs/`.
+
+Milestone 0 decisions:
+
+- Replace `code.py` with the package layout when implementation begins. Do not build the project around a single script.
+- Keep `REQUIREMENTS.md`, `PLAN.md`, and `TODO.md` at the repo root for now because the project is still small and the user is actively reviewing them there.
 
 ## Milestone 1: Minimal Project Setup
 

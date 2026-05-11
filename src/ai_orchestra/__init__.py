@@ -1,5 +1,6 @@
 """Tools for conditioned sine-signal reconstruction experiments."""
 
+from .dataset import make_one_hot
 from .defaults import DEFAULTS, PipelineDefaults
 from .signal_sets import SignalSet, generate_signal_set, generate_signal_sets
 
@@ -12,5 +13,6 @@ __all__ = [
     "__version__",
     "generate_signal_set",
     "generate_signal_sets",
+    "make_one_hot",
 ]
 

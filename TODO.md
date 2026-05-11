@@ -281,15 +281,23 @@ Milestone 10 validation:
 
 ## Milestone 11: Build One-Hot Encoding
 
-- [ ] Create `src/ai_orchestra/dataset.py`.
-- [ ] Add a function to create one-hot vectors.
-- [ ] Map class index `0` to `[1, 0, 0, 0]`.
-- [ ] Map class index `1` to `[0, 1, 0, 0]`.
-- [ ] Map class index `2` to `[0, 0, 1, 0]`.
-- [ ] Map class index `3` to `[0, 0, 0, 1]`.
-- [ ] Test every one-hot vector.
-- [ ] Test invalid class indices fail clearly.
-- [ ] Keep the one-hot length tied to the number of frequencies.
+- [x] Create `src/ai_orchestra/dataset.py`.
+- [x] Add a function to create one-hot vectors.
+- [x] Map class index `0` to `[1, 0, 0, 0]`.
+- [x] Map class index `1` to `[0, 1, 0, 0]`.
+- [x] Map class index `2` to `[0, 0, 1, 0]`.
+- [x] Map class index `3` to `[0, 0, 0, 1]`.
+- [x] Test every one-hot vector.
+- [x] Test invalid class indices fail clearly.
+- [x] Keep the one-hot length tied to the number of frequencies.
+
+Milestone 11 validation:
+
+- `make_one_hot()` lives in `src/ai_orchestra/dataset.py`.
+- One-hot length follows the configured number of frequencies.
+- Class indices `0`, `1`, `2`, and `3` map to the expected default vectors.
+- Invalid class indices raise clear `ValueError` messages.
+- Local Python compilation and direct one-hot sanity checks pass.
 
 ## Milestone 12: Build Window Indexing
 

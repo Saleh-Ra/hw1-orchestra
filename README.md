@@ -63,6 +63,17 @@ Both datasets are **lazy**: a single index is converted to a
 `(set, window, class)` triple on the fly, so a 50-signal-set run never
 materializes the full example tensor in memory.
 
+### What the data looks like
+
+The four clean sines we want the model to recover:
+
+![Clean sines at 1, 3, 5, 7 Hz](results/figures/raw_examples/clean_signals.png)
+
+The noisy mixed signal — this is the only input the model gets, sliced
+into `10`-sample windows:
+
+![Noisy mixed signal](results/figures/raw_examples/noisy_mixed_signal.png)
+
 ## The Models
 
 | Model | Module                                | Param count        | Input shape |
@@ -155,14 +166,18 @@ baseline in `compare_models` for fast iteration.
 ### Smoke comparison at 1 signal set (M30)
 
 `scripts/run_comparison.py` runs all three models on a single signal set
-for `5` epochs and writes:
+for `5` epochs and writes `results/metrics/model_comparison.{json,csv}`
+plus the two bar charts below.
 
-- `results/metrics/model_comparison.json`
-- `results/metrics/model_comparison.csv`
-- `results/figures/comparison/overall_test_mse.png`
-- `results/figures/comparison/per_frequency_test_mse.png`
+#### Overall test MSE
 
-Per-frequency test MSE (lower is better):
+![Overall test MSE by model](results/figures/comparison/overall_test_mse.png)
+
+#### Per-frequency test MSE
+
+![Per-frequency test MSE by model](results/figures/comparison/per_frequency_test_mse.png)
+
+Per-frequency test MSE in numbers (lower is better):
 
 | Model | 1 Hz     | 3 Hz     | 5 Hz     | 7 Hz     | Overall  |
 |-------|----------|----------|----------|----------|----------|
@@ -181,30 +196,43 @@ Per-frequency test MSE (lower is better):
   generalization claim. The held-out result above is the conservative
   number.
 
-### Plots
+### Plots per model
 
-Generated when the runners execute:
+Each baseline writes one loss curve and four prediction plots
+(one per target frequency) to `results/figures/<model>_baseline/`. The
+panels below show one representative `3 Hz` prediction and the loss curve
+for each architecture.
 
-- `results/figures/fc_baseline/fc_loss_curve.png`,
-  `fc_prediction_s{1..4}_{1,3,5,7}hz.png`
-- `results/figures/rnn_baseline/rnn_loss_curve.png`,
-  `rnn_prediction_s{1..4}_*hz.png`
-- `results/figures/lstm_baseline/lstm_loss_curve.png`,
-  `lstm_prediction_s{1..4}_*hz.png`
-- `results/figures/comparison/overall_test_mse.png`,
-  `per_frequency_test_mse.png`
-- `results/figures/raw_examples/clean_signals.png`,
-  `clean_mixed_signal.png`, `noisy_signals.png`,
-  `noisy_mixed_signal.png`
+#### Fully Connected
 
-How to read them:
+![FC 3 Hz prediction](results/figures/fc_baseline/fc_prediction_s2_3hz.png)
+
+![FC loss curve](results/figures/fc_baseline/fc_loss_curve.png)
+
+#### RNN
+
+![RNN 3 Hz prediction](results/figures/rnn_baseline/rnn_prediction_s2_3hz.png)
+
+![RNN loss curve](results/figures/rnn_baseline/rnn_loss_curve.png)
+
+#### LSTM
+
+![LSTM 3 Hz prediction](results/figures/lstm_baseline/lstm_prediction_s2_3hz.png)
+
+![LSTM loss curve](results/figures/lstm_baseline/lstm_loss_curve.png)
+
+The remaining frequencies (`1 Hz`, `5 Hz`, `7 Hz`) and the raw-signal
+plots live under `results/figures/` and are produced by the same runner
+scripts.
+
+How to read the plots:
 
 - **Prediction plots** show one clean target window (blue) and the model
   prediction (orange) for one requested frequency. Closer overlap is
   better.
 - **Loss curves** show average MSE per epoch on train and test. A
-  decreasing curve means the training loop, dataset, optimizer, and
-  model wiring are correctly wired together.
+  smooth decreasing curve means the training loop, dataset, optimizer,
+  and model wiring are correctly wired together.
 - **Overall MSE bar chart** ranks the three models by total test MSE.
 - **Per-frequency bar chart** groups bars by target frequency so the
   per-class breakdown is visible.

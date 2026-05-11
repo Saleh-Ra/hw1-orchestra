@@ -73,21 +73,28 @@ Milestone 1 blocker:
 
 ## Milestone 2: First Hardcoded Defaults
 
-- [ ] Create a simple defaults section in code before building full config files.
-- [ ] Define frequencies as `[1, 3, 5, 7]`.
-- [ ] Define sampling frequency as `1000`.
-- [ ] Define number of samples as `10000`.
-- [ ] Define signal duration as `10` seconds.
-- [ ] Define window size as `10`.
-- [ ] Define default number of generated signal sets as `50`.
-- [ ] Define default train ratio as `0.8`.
-- [ ] Define default random seed.
-- [ ] Define default amplitude range.
-- [ ] Define default phase range from `0` to `2pi`.
-- [ ] Define default amplitude noise strength.
-- [ ] Define default phase noise strength.
-- [ ] Define default additive noise strength if needed.
-- [ ] Keep these defaults easy to move into config later.
+- [x] Create a simple defaults section in code before building full config files.
+- [x] Define frequencies as `[1, 3, 5, 7]`.
+- [x] Define sampling frequency as `1000`.
+- [x] Define number of samples as `10000`.
+- [x] Define signal duration as `10` seconds.
+- [x] Define window size as `10`.
+- [x] Define default number of generated signal sets as `50`.
+- [x] Define default train ratio as `0.8`.
+- [x] Define default random seed.
+- [x] Define default amplitude range.
+- [x] Define default phase range from `0` to `2pi`.
+- [x] Define default amplitude noise strength.
+- [x] Define default phase noise strength.
+- [x] Define default additive noise strength if needed.
+- [x] Keep these defaults easy to move into config later.
+
+Milestone 2 validation:
+
+- Defaults live in `src/ai_orchestra/defaults.py` as a small dataclass.
+- The package exports `DEFAULTS` and `PipelineDefaults`.
+- Local Python compilation and default validation pass.
+- Full pytest/Ruff commands are still blocked until `uv` or local dev dependencies are available.
 
 ## Milestone 3: Generate One Clean Signal
 

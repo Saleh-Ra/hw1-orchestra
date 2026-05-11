@@ -10,6 +10,10 @@ Start with a minimal working ML pipeline first. Do not build all infrastructure 
 - `[x]` Done
 - Keep each item small enough to finish, test, or review independently.
 
+### Phase A: Planning And Project Setup
+
+Good commit scope: planning docs, project skeleton, defaults, import/test setup.
+
 ## Milestone 0: Planning Alignment
 
 - [x] Re-read `REQUIREMENTS.md`.
@@ -95,6 +99,10 @@ Milestone 2 validation:
 - The package exports `DEFAULTS` and `PipelineDefaults`.
 - Local Python compilation and default validation pass.
 - Full pytest/Ruff commands are still blocked until `uv` or local dev dependencies are available.
+
+### Phase B: Signal Generation Core
+
+Good commit scope: clean sine generation, random amplitudes/phases, noisy signal generation, mixed signals, and signal-set containers.
 
 ## Milestone 3: Generate One Clean Signal
 
@@ -253,6 +261,10 @@ Milestone 9 validation:
 - Unit tests use small `2` or `3` set configurations to keep memory and runtime low.
 - Local Python compilation and direct many-signal-set sanity checks pass.
 
+### Phase C: Raw Signal Visualization
+
+Good commit scope: plotting helpers and generated example figures, if we decide to commit selected result images.
+
 ## Milestone 10: Visualize Raw Signals Early
 
 - [x] Create `src/ai_orchestra/plotting.py`.
@@ -299,78 +311,132 @@ Milestone 11 validation:
 - Invalid class indices raise clear `ValueError` messages.
 - Local Python compilation and direct one-hot sanity checks pass.
 
+### Phase D: Dataset Construction
+
+Good commit scope: one-hot conditions, window indexing, FC dataset items, dataset size checks, splitting, and data loaders.
+
 ## Milestone 12: Build Window Indexing
 
-- [ ] Add logic to compute valid window start positions.
-- [ ] Use window size `10`.
-- [ ] Confirm valid starts are `0` through `9990`.
-- [ ] Confirm one signal set gives `9991` window positions.
-- [ ] Add a function to extract one window.
-- [ ] Test the first window.
-- [ ] Test a middle window.
-- [ ] Test the last valid window.
-- [ ] Test that off-by-one errors are not present.
-- [ ] Test invalid window starts fail clearly.
+- [x] Add logic to compute valid window start positions.
+- [x] Use window size `10`.
+- [x] Confirm valid starts are `0` through `9990`.
+- [x] Confirm one signal set gives `9991` window positions.
+- [x] Add a function to extract one window.
+- [x] Test the first window.
+- [x] Test a middle window.
+- [x] Test the last valid window.
+- [x] Test that off-by-one errors are not present.
+- [x] Test invalid window starts fail clearly.
+
+Milestone 12 validation:
+
+- `valid_window_starts()` returns starts from `0` through `9990`.
+- One default signal produces `9991` valid window positions.
+- `extract_window()` returns 10-sample windows for first, middle, and last valid starts.
+- Invalid starts and non-1D inputs raise clear `ValueError` messages.
+- Local Python compilation and direct window-indexing sanity checks pass.
 
 ## Milestone 13: Build FC Dataset Items
 
-- [ ] Create dataset logic for fully connected input format.
-- [ ] For each signal set, iterate through valid window positions.
-- [ ] For each window position, create one example per target frequency.
-- [ ] Extract the noisy mixed signal window.
-- [ ] Extract the matching clean target signal window.
-- [ ] Append the one-hot vector to the noisy input window.
-- [ ] Ensure FC input shape is `(14,)`.
-- [ ] Ensure target shape is `(10,)`.
-- [ ] Ensure values are returned as PyTorch tensors.
-- [ ] Use float tensors.
-- [ ] Test the first FC dataset item.
-- [ ] Test an FC item for each condition vector.
-- [ ] Test that `C = [1, 0, 0, 0]` targets `S1`.
-- [ ] Test that `C = [0, 1, 0, 0]` targets `S2`.
-- [ ] Test that `C = [0, 0, 1, 0]` targets `S3`.
-- [ ] Test that `C = [0, 0, 0, 1]` targets `S4`.
-- [ ] Test FC input length is exactly `14`.
-- [ ] Test target length is exactly `10`.
+- [x] Create dataset logic for fully connected input format.
+- [x] For each signal set, iterate through valid window positions.
+- [x] For each window position, create one example per target frequency.
+- [x] Extract the noisy mixed signal window.
+- [x] Extract the matching clean target signal window.
+- [x] Append the one-hot vector to the noisy input window.
+- [x] Ensure FC input shape is `(14,)`.
+- [x] Ensure target shape is `(10,)`.
+- [x] Ensure values are returned as PyTorch tensors.
+- [x] Use float tensors.
+- [x] Test the first FC dataset item.
+- [x] Test an FC item for each condition vector.
+- [x] Test that `C = [1, 0, 0, 0]` targets `S1`.
+- [x] Test that `C = [0, 1, 0, 0]` targets `S2`.
+- [x] Test that `C = [0, 0, 1, 0]` targets `S3`.
+- [x] Test that `C = [0, 0, 0, 1]` targets `S4`.
+- [x] Test FC input length is exactly `14`.
+- [x] Test target length is exactly `10`.
+
+Milestone 13 validation:
+
+- `FullyConnectedSignalDataset` lazily maps signal sets to FC examples.
+- One default signal set produces `9991 * 4 = 39964` examples.
+- Dataset indexing orders examples by window position, then target class.
+- Each item is implemented as noisy mixed window plus one-hot condition and matching clean target window.
+- Local Python compilation and dataset length/index metadata checks pass.
+- PyTorch is not installed locally, so tensor-return tests are written but will execute fully after dependencies are installed.
 
 ## Milestone 14: Dataset Size Checks
 
-- [ ] Compute examples per signal set.
-- [ ] Confirm one set gives `9991 * 4 = 39964` examples.
-- [ ] Confirm `50` sets gives `1998200` examples if fully materialized.
-- [ ] Decide whether to materialize all examples or index lazily.
-- [ ] Prefer lazy indexing if memory is too large.
-- [ ] Implement lazy indexing if needed.
-- [ ] Test dataset length with one set.
-- [ ] Test dataset length with two sets.
-- [ ] Test dataset length with fifty sets or a simulated equivalent.
-- [ ] Make sure length calculation is fast.
-- [ ] Make sure item retrieval is fast enough for training.
+- [x] Compute examples per signal set.
+- [x] Confirm one set gives `9991 * 4 = 39964` examples.
+- [x] Confirm `50` sets gives `1998200` examples if fully materialized.
+- [x] Decide whether to materialize all examples or index lazily.
+- [x] Prefer lazy indexing if memory is too large.
+- [x] Implement lazy indexing if needed.
+- [x] Test dataset length with one set.
+- [x] Test dataset length with two sets.
+- [x] Test dataset length with fifty sets or a simulated equivalent.
+- [x] Make sure length calculation is fast.
+- [x] Make sure item retrieval is fast enough for training.
+
+Milestone 14 validation:
+
+- `examples_per_signal_set()` returns `39964`.
+- `total_examples(50)` returns `1998200`.
+- `FullyConnectedSignalDataset` uses lazy indexing, so it does not materialize all examples.
+- Dataset length checks pass for one, two, and fifty simulated signal sets.
+- Added `requirements.txt` as a fallback install file for environments that do not use `uv`.
+- Local Python compilation and direct dataset-size sanity checks pass.
 
 ## Milestone 15: Minimal Train/Test Split
 
-- [ ] Add deterministic train/test split.
-- [ ] Use `80/20` as the default.
-- [ ] Use a random seed for the split.
-- [ ] Start with random split for the minimal pipeline.
-- [ ] Document that time-based split may be added later.
-- [ ] Confirm train set length is about 80%.
-- [ ] Confirm test set length is about 20%.
-- [ ] Confirm no index appears in both sets.
-- [ ] Test split reproducibility.
-- [ ] Test split ratio can be changed later.
+- [x] Add deterministic train/test split.
+- [x] Use `80/20` as the default.
+- [x] Use a random seed for the split.
+- [x] Start with random split for the minimal pipeline.
+- [x] Document that time-based split may be added later.
+- [x] Confirm train set length is about 80%.
+- [x] Confirm test set length is about 20%.
+- [x] Confirm no index appears in both sets.
+- [x] Test split reproducibility.
+- [x] Test split ratio can be changed later.
+
+Milestone 15 validation:
+
+- `train_test_split_indices()` creates deterministic random index splits.
+- Default split is `80/20`.
+- Split indices are reproducible with the same seed.
+- Train/test indices do not overlap and cover all input indices.
+- Split ratio can be changed, for example to `70/30`.
+- This is the simple baseline split; time-based splitting remains a later stricter-evaluation option.
+- Local Python compilation and direct split sanity checks pass.
 
 ## Milestone 16: Create DataLoader
 
-- [ ] Add PyTorch `DataLoader` creation.
-- [ ] Use shuffle for the training loader.
-- [ ] Do not shuffle the test loader.
-- [ ] Set a simple default batch size.
-- [ ] Fetch one training batch.
-- [ ] Confirm batch input shape is `(batch_size, 14)`.
-- [ ] Confirm batch target shape is `(batch_size, 10)`.
-- [ ] Confirm batch tensors are finite.
-- [ ] Add a small test for DataLoader output shapes.
+- [x] Add PyTorch `DataLoader` creation.
+- [x] Use shuffle for the training loader.
+- [x] Do not shuffle the test loader.
+- [x] Set a simple default batch size.
+- [x] Fetch one training batch.
+- [x] Confirm batch input shape is `(batch_size, 14)`.
+- [x] Confirm batch target shape is `(batch_size, 10)`.
+- [x] Confirm batch tensors are finite.
+- [x] Add a small test for DataLoader output shapes.
+
+Milestone 16 validation:
+
+- `create_data_loaders()` lives in `src/ai_orchestra/dataloaders.py`.
+- Training loader uses `shuffle=True`.
+- Test loader uses `shuffle=False`.
+- Default batch size is `64` via `DEFAULTS.batch_size`.
+- DataLoader tests are written to fetch batches and check shapes/finite tensors once PyTorch is installed.
+- Local Python compilation and direct DataLoader import/default checks pass.
+- PyTorch is not installed locally, so full batch-fetch validation is dependency-blocked for now.
+
+### Phase E: First Fully Connected Baseline
+
+Good commit scope: FC model, training loop, overfit check, first real FC baseline, FC plots, and a minimal runner.
 
 ## Milestone 17: Build The First FC Model
 
@@ -494,6 +560,10 @@ Milestone 11 validation:
 - [ ] Decide whether to improve FC before adding RNN.
 - [ ] Do not add RNN before this gate is passed.
 
+### Phase F: Sequence Models
+
+Good commit scope: sequence dataset format, simple RNN, LSTM, and their review gates.
+
 ## Milestone 25: Prepare Sequence Dataset Format
 
 - [ ] Add sequence-format dataset support.
@@ -568,6 +638,10 @@ Milestone 11 validation:
 - [ ] Run tests.
 - [ ] Run Ruff.
 - [ ] Fix any easy issues.
+
+### Phase G: Evaluation, Experiments, And Results
+
+Good commit scope: model comparison metrics, config files, experiment variants, stricter generalization checks, and result organization.
 
 ## Milestone 30: Model Comparison
 
@@ -671,6 +745,10 @@ Milestone 11 validation:
 - [ ] Add conclusions.
 - [ ] Mention limitations.
 - [ ] Mention possible future work.
+
+### Phase H: Final Polish And Optional Enhancements
+
+Good commit scope: final quality pass, cleanup, documentation consistency, and optional features after the core project works.
 
 ## Milestone 36: Final Quality Pass
 

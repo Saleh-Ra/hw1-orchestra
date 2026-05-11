@@ -1,20 +1,23 @@
-"""First fully connected baseline experiment."""
+"""Shared runner for sequence-format baseline experiments (RNN, LSTM, ...)."""
 
+from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
 
 from .dataloaders import create_data_loaders
-from .dataset import FullyConnectedSignalDataset, train_test_split_indices
+from .dataset import train_test_split_indices
 from .defaults import DEFAULTS, PipelineDefaults
 from .prediction_sampling import sample_prediction_indices, sample_predictions
+from .sequence_dataset import SequenceSignalDataset
 from .signal_sets import generate_signal_sets
 
 
 @dataclass(frozen=True)
-class FcBaselineResult:
-    """In-memory result from the first FC baseline run."""
+class SequenceBaselineResult:
+    """In-memory result from one sequence-format baseline run."""
 
     train_losses: list[float]
     test_losses: list[float]
@@ -23,7 +26,8 @@ class FcBaselineResult:
     class_indices: list[int]
 
 
-def run_fc_baseline(
+def run_sequence_baseline(
+    model_factory: Callable[[int], Any],
     defaults: PipelineDefaults = DEFAULTS,
     signal_set_count: int | None = None,
     epochs: int = 3,
@@ -31,8 +35,8 @@ def run_fc_baseline(
     prediction_count: int = 4,
     seed: int = DEFAULTS.random_seed,
     device: str | None = None,
-) -> FcBaselineResult:
-    """Train the first FC baseline and return losses plus sample predictions."""
+) -> SequenceBaselineResult:
+    """Train any sequence-format model on the sequence dataset."""
     defaults.validate()
     if epochs <= 0:
         msg = "Epoch count must be positive."
@@ -43,12 +47,11 @@ def run_fc_baseline(
 
     import torch
 
-    from .models import FullyConnectedSignalNet
     from .training import create_adam_optimizer, evaluate_one_epoch, train_one_epoch
 
     torch.manual_seed(seed)
     signal_sets = generate_signal_sets(defaults, count=signal_set_count, seed=seed)
-    dataset = FullyConnectedSignalDataset(signal_sets, defaults)
+    dataset = SequenceSignalDataset(signal_sets, defaults)
     train_indices, test_indices = train_test_split_indices(
         len(dataset),
         train_ratio=defaults.train_ratio,
@@ -60,7 +63,7 @@ def run_fc_baseline(
         test_indices,
         defaults,
     )
-    model = FullyConnectedSignalNet()
+    model = model_factory(dataset.feature_size)
     optimizer = create_adam_optimizer(model, learning_rate)
 
     train_losses: list[float] = []
@@ -80,7 +83,7 @@ def run_fc_baseline(
         prediction_indices,
         device,
     )
-    return FcBaselineResult(
+    return SequenceBaselineResult(
         train_losses=train_losses,
         test_losses=test_losses,
         predictions=predictions,

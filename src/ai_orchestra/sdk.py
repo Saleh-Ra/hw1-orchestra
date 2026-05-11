@@ -4,11 +4,32 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from .baseline import FcBaselineResult, run_fc_baseline
+from .baseline import FcBaselineResult
 from .dataset import FullyConnectedSignalDataset
 from .defaults import DEFAULTS, PipelineDefaults
-from .fc_plotting import plot_fc_baseline_result
+from .model_entries import (
+    plot_fc_predictions,
+    plot_lstm_predictions,
+    plot_rnn_predictions,
+    train_fc_baseline,
+    train_lstm_baseline,
+    train_rnn_baseline,
+)
 from .signal_sets import SignalSet, generate_signal_sets
+
+__all__ = [
+    "MinimalFcPipelineResult",
+    "build_fc_dataset",
+    "plot_fc_predictions",
+    "plot_lstm_predictions",
+    "plot_rnn_predictions",
+    "run_minimal_fc_pipeline",
+    "run_signal_generation",
+    "summarize_minimal_result",
+    "train_fc_baseline",
+    "train_lstm_baseline",
+    "train_rnn_baseline",
+]
 
 
 @dataclass(frozen=True)
@@ -34,42 +55,6 @@ def build_fc_dataset(
 ) -> FullyConnectedSignalDataset:
     """Build the lazy fully connected dataset for generated signal sets."""
     return FullyConnectedSignalDataset(signal_sets, defaults)
-
-
-def train_fc_baseline(
-    defaults: PipelineDefaults = DEFAULTS,
-    signal_set_count: int | None = None,
-    epochs: int = 3,
-    learning_rate: float = 1e-3,
-    prediction_count: int = 4,
-    seed: int = DEFAULTS.random_seed,
-    device: str | None = None,
-) -> FcBaselineResult:
-    """Train the current FC baseline through the package entry point."""
-    return run_fc_baseline(
-        defaults=defaults,
-        signal_set_count=signal_set_count,
-        epochs=epochs,
-        learning_rate=learning_rate,
-        prediction_count=prediction_count,
-        seed=seed,
-        device=device,
-    )
-
-
-def plot_fc_predictions(
-    baseline: FcBaselineResult,
-    defaults: PipelineDefaults = DEFAULTS,
-    output_dir: str | Path = "results/figures/fc_baseline",
-    model_name: str = "FC",
-) -> list[Path]:
-    """Save FC prediction and loss plots for a baseline result."""
-    return plot_fc_baseline_result(
-        baseline,
-        defaults.frequencies_hz,
-        output_dir,
-        model_name,
-    )
 
 
 def run_minimal_fc_pipeline(

@@ -639,78 +639,185 @@ Good commit scope: sequence dataset format, simple RNN, LSTM, and their review g
 
 ## Milestone 25: Prepare Sequence Dataset Format
 
-- [ ] Add sequence-format dataset support.
-- [ ] Keep the same underlying signal sets.
-- [ ] Keep the same target windows.
-- [ ] For each time step, include the noisy sample.
-- [ ] For each time step, include the full one-hot vector.
-- [ ] Ensure each sequence input shape is `(10, 5)`.
-- [ ] Ensure each sequence target shape is `(10,)`.
-- [ ] Test sequence shape for one item.
-- [ ] Test sequence shape for one batch.
-- [ ] Test sequence target mapping for each class.
-- [ ] Reuse as much indexing logic as possible.
-- [ ] Avoid duplicating target-mapping logic.
+- [x] Add sequence-format dataset support.
+- [x] Keep the same underlying signal sets.
+- [x] Keep the same target windows.
+- [x] For each time step, include the noisy sample.
+- [x] For each time step, include the full one-hot vector.
+- [x] Ensure each sequence input shape is `(10, 5)`.
+- [x] Ensure each sequence target shape is `(10,)`.
+- [x] Test sequence shape for one item.
+- [x] Test sequence shape for one batch.
+- [x] Test sequence target mapping for each class.
+- [x] Reuse as much indexing logic as possible.
+- [x] Avoid duplicating target-mapping logic.
+
+Milestone 25 validation:
+
+- `SequenceSignalDataset` lives in `src/ai_orchestra/sequence_dataset.py`.
+- It composes `FullyConnectedSignalDataset` internally to reuse all indexing and target-mapping logic.
+- Each item returns a `(10, 5)` sequence input and a `(10,)` target tensor.
+- Per time step, the first channel holds the noisy mixed sample and the remaining four channels hold the repeated one-hot condition.
+- Tests cover length, item shapes, target mapping per class, condition repetition across time steps, middle-window indexing, batch shape via `DataLoader`, and invalid index handling.
 
 ## Milestone 26: Add Simple RNN
 
-- [ ] Add `RnnSignalNet`.
-- [ ] Accept input shape `(batch_size, 10, 5)`.
-- [ ] Use a configurable hidden size.
-- [ ] Start with one recurrent layer.
-- [ ] Map recurrent outputs to one value per time step.
-- [ ] Return output shape `(batch_size, 10)`.
-- [ ] Run one fake sequence batch through the RNN.
-- [ ] Test RNN output shape.
-- [ ] Test RNN output contains finite values.
-- [ ] Train RNN on a tiny subset.
-- [ ] Confirm RNN training loop does not crash.
-- [ ] Confirm RNN loss is finite.
-- [ ] Train RNN on the same baseline data as FC.
-- [ ] Save RNN loss curve.
-- [ ] Save RNN prediction plots.
+- [x] Add `RnnSignalNet`.
+- [x] Accept input shape `(batch_size, 10, 5)`.
+- [x] Use a configurable hidden size.
+- [x] Start with one recurrent layer.
+- [x] Map recurrent outputs to one value per time step.
+- [x] Return output shape `(batch_size, 10)`.
+- [x] Run one fake sequence batch through the RNN.
+- [x] Test RNN output shape.
+- [x] Test RNN output contains finite values.
+- [x] Train RNN on a tiny subset.
+- [x] Confirm RNN training loop does not crash.
+- [x] Confirm RNN loss is finite.
+- [x] Train RNN on the same baseline data as FC.
+- [x] Save RNN loss curve.
+- [x] Save RNN prediction plots.
+
+Milestone 26 validation:
+
+- `RnnSignalNet` lives in `src/ai_orchestra/models.py`. It uses one `nn.RNN`
+  layer with a configurable hidden size, plus a per-time-step linear head.
+- `run_rnn_baseline()` lives in `src/ai_orchestra/rnn_baseline.py` and trains
+  the RNN on the same `SequenceSignalDataset` built from the same signal sets
+  and the same train/test split seed used by the FC baseline.
+- `plot_rnn_baseline_result()` lives in `src/ai_orchestra/rnn_plotting.py`
+  and reuses the generic `plot_prediction_window` and `plot_loss_curves`
+  helpers, so no plotting code is duplicated.
+- Shared `resolve_device`, `sample_prediction_indices`, and `sample_predictions`
+  were extracted to `src/ai_orchestra/prediction_sampling.py` so both FC and
+  RNN baselines and the training loops use one implementation.
+- SDK now exposes `train_rnn_baseline` and `plot_rnn_predictions` next to the
+  FC entry points.
+- Quick run (1 signal set, 100 samples, 5 epochs) drops both train and test
+  loss from about `0.64` to `0.33`, clearly faster than the FC baseline at
+  the same scale, with very small train/test gap.
+- Plots saved under `results/figures/rnn_baseline/`.
+- Visual quality of the predictions is still poor at this smoke-run scale,
+  so improvement is left for the RNN review gate in Milestone 27.
 
 ## Milestone 27: RNN Review Gate
 
-- [ ] Compare RNN train loss to FC train loss.
-- [ ] Compare RNN test loss to FC test loss.
-- [ ] Inspect RNN prediction plots.
-- [ ] Check whether RNN improves reconstruction.
-- [ ] Check whether RNN is unstable.
-- [ ] Note whether the window size is too short for RNN advantage.
-- [ ] Run tests.
-- [ ] Run Ruff.
-- [ ] Fix any easy issues.
-- [ ] Do not add LSTM before this gate is passed.
+- [x] Compare RNN train loss to FC train loss.
+- [x] Compare RNN test loss to FC test loss.
+- [x] Inspect RNN prediction plots.
+- [x] Check whether RNN improves reconstruction.
+- [x] Check whether RNN is unstable.
+- [x] Note whether the window size is too short for RNN advantage.
+- [x] Run tests.
+- [x] Run Ruff.
+- [x] Fix any easy issues.
+- [x] Do not add LSTM before this gate is passed.
+
+Milestone 27 review result:
+
+- Same-seed, same-defaults comparison run (1 signal set, 100 samples, batch 32, 5 epochs):
+  - FC  final loss: train `0.5049`, test `0.5148`.
+  - RNN final loss: train `0.3323`, test `0.3337`.
+  - RNN improves over FC by about `34.2%` on train loss and `35.2%` on test loss.
+- RNN training is stable: loss decreases smoothly and monotonically every epoch,
+  no NaN spikes, and the train/test gap stays around `0.001`.
+- RNN prediction plots are visibly slightly better than FC (predictions track
+  the sign and trend of the target more often), but at this smoke-run scale
+  most predictions still do not closely match the target windows.
+- Window size note: with `window_size=10` at `1000 Hz` sampling, the window
+  covers `10 ms`. At `1 Hz` that is only `1%` of one period (a near-linear
+  segment), and at `7 Hz` it is about `7%`. Any sequence model has very little
+  temporal structure to exploit at this window size, which caps how much RNN
+  or LSTM can beat FC unless the data scale and window size are increased.
+- Quality gate: `131` tests pass, Ruff is clean, no easy issues to fix.
+- Decision: gate passes. Adding LSTM is justified to compare against RNN on
+  the same data, with the same window-size caveat documented.
 
 ## Milestone 28: Add LSTM
 
-- [ ] Add `LstmSignalNet`.
-- [ ] Accept input shape `(batch_size, 10, 5)`.
-- [ ] Use a configurable hidden size.
-- [ ] Start with one LSTM layer.
-- [ ] Map LSTM outputs to one value per time step.
-- [ ] Return output shape `(batch_size, 10)`.
-- [ ] Run one fake sequence batch through the LSTM.
-- [ ] Test LSTM output shape.
-- [ ] Test LSTM output contains finite values.
-- [ ] Train LSTM on a tiny subset.
-- [ ] Confirm LSTM training loop does not crash.
-- [ ] Confirm LSTM loss is finite.
-- [ ] Train LSTM on the same baseline data as FC and RNN.
-- [ ] Save LSTM loss curve.
-- [ ] Save LSTM prediction plots.
+- [x] Add `LstmSignalNet`.
+- [x] Accept input shape `(batch_size, 10, 5)`.
+- [x] Use a configurable hidden size.
+- [x] Start with one LSTM layer.
+- [x] Map LSTM outputs to one value per time step.
+- [x] Return output shape `(batch_size, 10)`.
+- [x] Run one fake sequence batch through the LSTM.
+- [x] Test LSTM output shape.
+- [x] Test LSTM output contains finite values.
+- [x] Train LSTM on a tiny subset.
+- [x] Confirm LSTM training loop does not crash.
+- [x] Confirm LSTM loss is finite.
+- [x] Train LSTM on the same baseline data as FC and RNN.
+- [x] Save LSTM loss curve.
+- [x] Save LSTM prediction plots.
+
+Milestone 28 validation:
+
+- `LstmSignalNet` lives in `src/ai_orchestra/models.py`. It and `RnnSignalNet`
+  now share a small `_SequenceSignalNet` base class that holds the per-time-step
+  linear head and the common forward pass, so only the recurrent cell differs.
+- `run_lstm_baseline()` lives in `src/ai_orchestra/lstm_baseline.py` and uses
+  the shared `run_sequence_baseline` runner from `sequence_baseline.py`.
+- `plot_lstm_baseline_result()` lives in `src/ai_orchestra/lstm_plotting.py`
+  and reuses the shared `plot_sequence_baseline_result` helper.
+- `rnn_baseline.py` and `rnn_plotting.py` were refactored to call the same
+  shared runner and plotting helper, so RNN, LSTM, and any future sequence
+  model share one code path. `baseline.py` for FC was left as-is since it
+  uses a different dataset.
+- `model_entries.py` was added to hold per-model SDK wrappers and keep
+  `sdk.py` focused on the runnable pipeline. No file exceeds 150 lines now.
+- SDK exposes `train_lstm_baseline` and `plot_lstm_predictions` next to the
+  FC and RNN entries.
+- Quick run (1 signal set, 100 samples, batch 32, 5 epochs):
+  - LSTM train loss: `0.6447 -> 0.5369`.
+  - LSTM test loss: `0.7013 -> 0.5636`.
+  - Smooth monotonic decrease, loss is finite, no crashes.
+- Plots saved under `results/figures/lstm_baseline/`.
+- The LSTM is slower to converge than the simple RNN at the same epoch
+  count, which is expected given the larger gate parameter set. The full
+  LSTM vs RNN comparison and the worth-the-complexity call is left for
+  the LSTM review gate in Milestone 29.
 
 ## Milestone 29: LSTM Review Gate
 
-- [ ] Compare LSTM train loss to FC and RNN.
-- [ ] Compare LSTM test loss to FC and RNN.
-- [ ] Inspect LSTM prediction plots.
-- [ ] Check whether LSTM improves reconstruction.
-- [ ] Check whether LSTM is worth the added complexity.
-- [ ] Run tests.
-- [ ] Run Ruff.
-- [ ] Fix any easy issues.
+- [x] Compare LSTM train loss to FC and RNN.
+- [x] Compare LSTM test loss to FC and RNN.
+- [x] Inspect LSTM prediction plots.
+- [x] Check whether LSTM improves reconstruction.
+- [x] Check whether LSTM is worth the added complexity.
+- [x] Run tests.
+- [x] Run Ruff.
+- [x] Fix any easy issues.
+
+Milestone 29 review result:
+
+- Same-seed, same-defaults comparison (1 signal set, 100 samples, batch 32,
+  5 epochs, learning rate `1e-3`, hidden size `32`):
+
+  | Model | Final train loss | Final test loss |
+  | ----- | ---------------- | --------------- |
+  | FC    | `0.5049`         | `0.5148`        |
+  | RNN   | `0.3323`         | `0.3337`        |
+  | LSTM  | `0.5369`         | `0.5636`        |
+
+- Versus FC: LSTM is `6.3%` worse on train and `9.5%` worse on test loss.
+- Versus RNN: LSTM is `61.6%` worse on train and `68.9%` worse on test loss.
+- LSTM training is **stable**: smooth monotonic decrease every epoch, no NaN,
+  finite outputs throughout, no crashes.
+- LSTM prediction plots: at this scale predictions hover near `0` for all
+  four target frequencies, well off targets like `-0.78` (5 Hz) and `-1.25`
+  (7 Hz). Visually the LSTM is worse than RNN and roughly on par with FC.
+- Honest interpretation: at five epochs and one signal set, the LSTM is
+  clearly **undertrained**. With four gates and a cell state it has many
+  more parameters than the simple RNN, so it needs more data and more epochs
+  to reach the same point. Loss is still decreasing per epoch, so the
+  architecture works — it just hasn't converged yet at this smoke-run scale.
+- Worth-the-complexity call at the current scale: **no**. At the current
+  scale the simple RNN beats both FC and LSTM and trains faster too.
+- Worth investigating later: at larger scale (more signal sets, longer
+  training, possibly a longer window) the LSTM may surpass the RNN. That
+  belongs in a proper experiment milestone, not the smoke baseline.
+- Quality gate: `139` tests pass, Ruff clean, no easy issues to fix.
 
 ### Phase G: Evaluation, Experiments, And Results
 

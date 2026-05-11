@@ -1,0 +1,41 @@
+{
+  "description": "Reduce all three noise strengths to a quiet regime.",
+  "experiments_source": "experiments.json",
+  "name": "noise_low",
+  "overrides": {
+    "additive_noise_std": 0.005,
+    "amplitude_noise_std": 0.02,
+    "phase_noise_std": 0.02
+  },
+  "resolved_defaults": {
+    "additive_noise_std": 0.005,
+    "amplitude_noise_std": 0.02,
+    "amplitude_range": [
+      0.5,
+      1.5
+    ],
+    "batch_size": 32,
+    "duration_seconds": 10.0,
+    "epochs": 3,
+    "frequencies_hz": [
+      1.0,
+      3.0,
+      5.0,
+      7.0
+    ],
+    "hidden_size": 32,
+    "learning_rate": 0.001,
+    "num_layers": 1,
+    "num_samples": 100,
+    "num_signal_sets": 50,
+    "phase_noise_std": 0.02,
+    "phase_range": [
+      0.0,
+      6.283185307179586
+    ],
+    "random_seed": 42,
+    "sampling_frequency_hz": 1000,
+    "train_ratio": 0.8,
+    "window_size": 10
+  }
+}

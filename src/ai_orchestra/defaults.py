@@ -22,6 +22,10 @@ class PipelineDefaults:
     amplitude_noise_std: float = 0.10
     phase_noise_std: float = 0.10
     additive_noise_std: float = 0.02
+    epochs: int = 3
+    learning_rate: float = 1e-3
+    hidden_size: int = 32
+    num_layers: int = 1
 
     def validate(self) -> None:
         """Raise a clear error if a default value is internally inconsistent."""
@@ -61,6 +65,18 @@ class PipelineDefaults:
             self.additive_noise_std,
         ) < 0:
             msg = "Noise strengths must be non-negative."
+            raise ValueError(msg)
+        if self.epochs <= 0:
+            msg = "Epoch count must be positive."
+            raise ValueError(msg)
+        if self.learning_rate <= 0:
+            msg = "Learning rate must be positive."
+            raise ValueError(msg)
+        if self.hidden_size <= 0:
+            msg = "Hidden size must be positive."
+            raise ValueError(msg)
+        if self.num_layers <= 0:
+            msg = "Layer count must be positive."
             raise ValueError(msg)
 
 

@@ -255,19 +255,29 @@ Milestone 9 validation:
 
 ## Milestone 10: Visualize Raw Signals Early
 
-- [ ] Create `src/ai_orchestra/plotting.py`.
-- [ ] Add a function to plot clean individual signals.
-- [ ] Add a function to plot noisy individual signals.
-- [ ] Add a function to plot clean mixed signal.
-- [ ] Add a function to plot noisy mixed signal.
-- [ ] Limit plotted samples so figures are readable.
-- [ ] Save plots to a results folder.
-- [ ] Ensure plotting works without an interactive display.
-- [ ] Generate one raw clean-signal plot manually.
-- [ ] Generate one noisy-signal plot manually.
-- [ ] Generate one mixed-signal plot manually.
-- [ ] Visually inspect the plots.
-- [ ] Fix signal generation if plots look obviously wrong.
+- [x] Create `src/ai_orchestra/plotting.py`.
+- [x] Add a function to plot clean individual signals.
+- [x] Add a function to plot noisy individual signals.
+- [x] Add a function to plot clean mixed signal.
+- [x] Add a function to plot noisy mixed signal.
+- [x] Limit plotted samples so figures are readable.
+- [x] Save plots to a results folder.
+- [x] Ensure plotting works without an interactive display.
+- [x] Generate one raw clean-signal plot manually.
+- [x] Generate one noisy-signal plot manually.
+- [x] Generate one mixed-signal plot manually.
+- [x] Visually inspect the plots.
+- [x] Fix signal generation if plots look obviously wrong.
+
+Milestone 10 validation:
+
+- `plot_signal_stack()` saves readable individual-signal plots.
+- `plot_mixed_signal()` saves readable mixed-signal plots.
+- `plot_raw_signal_examples()` saves clean, noisy, clean-mix, and noisy-mix examples.
+- Matplotlib uses the non-interactive `Agg` backend.
+- Example plots were generated under `results/figures/raw_examples/`.
+- Visual inspection showed the plots look reasonable, so no signal-generation fix was needed.
+- Local Python compilation and direct plotting sanity checks pass.
 
 ## Milestone 11: Build One-Hot Encoding
 

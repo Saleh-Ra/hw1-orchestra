@@ -144,29 +144,46 @@ Milestone 4 validation:
 
 ## Milestone 5: Add Random Amplitude And Phase
 
-- [ ] Add random amplitude sampling.
-- [ ] Add random phase sampling.
-- [ ] Keep phase values between `0` and `2pi`.
-- [ ] Use one random amplitude per signal per signal set.
-- [ ] Use one random phase per signal per signal set.
-- [ ] Make random generation seed-controlled.
-- [ ] Test that the same seed gives the same amplitudes.
-- [ ] Test that the same seed gives the same phases.
-- [ ] Test that a different seed changes at least one signal.
-- [ ] Keep the random logic simple and readable.
+- [x] Add random amplitude sampling.
+- [x] Add random phase sampling.
+- [x] Keep phase values between `0` and `2pi`.
+- [x] Use one random amplitude per signal per signal set.
+- [x] Use one random phase per signal per signal set.
+- [x] Make random generation seed-controlled.
+- [x] Test that the same seed gives the same amplitudes.
+- [x] Test that the same seed gives the same phases.
+- [x] Test that a different seed changes at least one signal.
+- [x] Keep the random logic simple and readable.
+
+Milestone 5 validation:
+
+- `sample_signal_parameters()` samples one amplitude and one phase per configured frequency.
+- The same seed reproduces the same amplitudes and phases.
+- Different seeds change at least one sampled parameter.
+- Sampled phases stay between `0` and `2pi`.
+- Local Python compilation and direct random-parameter sanity checks pass.
 
 ## Milestone 6: Generate Noisy Signal Versions
 
-- [ ] Add amplitude noise to create noisy versions.
-- [ ] Add phase noise to create noisy versions.
-- [ ] Optionally add small direct sample noise if needed.
-- [ ] Keep noisy signal shape equal to clean signal shape.
-- [ ] Ensure noisy signals are based on the same frequencies as clean signals.
-- [ ] Ensure noisy signals differ from clean signals.
-- [ ] Test noisy signal shape is `(4, 10000)`.
-- [ ] Test noisy signal values are finite.
-- [ ] Test noisy generation is reproducible with a seed.
-- [ ] Test that increasing noise strength changes the noisy signals more.
+- [x] Add amplitude noise to create noisy versions.
+- [x] Add phase noise to create noisy versions.
+- [x] Optionally add small direct sample noise if needed.
+- [x] Keep noisy signal shape equal to clean signal shape.
+- [x] Ensure noisy signals are based on the same frequencies as clean signals.
+- [x] Ensure noisy signals differ from clean signals.
+- [x] Test noisy signal shape is `(4, 10000)`.
+- [x] Test noisy signal values are finite.
+- [x] Test noisy generation is reproducible with a seed.
+- [x] Test that increasing noise strength changes the noisy signals more.
+
+Milestone 6 validation:
+
+- `generate_noisy_signals()` creates noisy versions from the same configured frequencies.
+- Noisy signals include amplitude noise, phase noise, and optional additive sample noise.
+- The noisy stack keeps shape `(4, 10000)` and contains finite values.
+- Seeded noisy generation is reproducible.
+- Stronger noise settings move noisy signals farther from the clean baseline.
+- Local Python compilation and direct noisy-signal sanity checks pass.
 
 ## Milestone 7: Combine Signals
 

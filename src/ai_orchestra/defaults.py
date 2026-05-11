@@ -15,6 +15,7 @@ class PipelineDefaults:
     window_size: int = 10
     num_signal_sets: int = 50
     train_ratio: float = 0.8
+    batch_size: int = 64
     random_seed: int = 42
     amplitude_range: tuple[float, float] = (0.5, 1.5)
     phase_range: tuple[float, float] = (0.0, tau)
@@ -41,6 +42,9 @@ class PipelineDefaults:
             raise ValueError(msg)
         if not 0.0 < self.train_ratio < 1.0:
             msg = "Train ratio must be between 0 and 1."
+            raise ValueError(msg)
+        if self.batch_size <= 0:
+            msg = "Batch size must be positive."
             raise ValueError(msg)
         if self.amplitude_range[0] <= 0 or self.amplitude_range[0] >= self.amplitude_range[1]:
             msg = "Amplitude range must be positive and increasing."

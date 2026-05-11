@@ -14,6 +14,7 @@ def test_default_signal_values_match_plan() -> None:
 def test_default_training_values_match_plan() -> None:
     assert DEFAULTS.num_signal_sets == 50
     assert DEFAULTS.train_ratio == 0.8
+    assert DEFAULTS.batch_size == 64
     assert isinstance(DEFAULTS.random_seed, int)
 
 

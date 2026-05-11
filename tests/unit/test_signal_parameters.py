@@ -43,9 +43,14 @@ def test_sampled_phases_stay_between_zero_and_two_pi() -> None:
 
 def test_random_parameters_generate_reproducible_clean_signals() -> None:
     first_amplitudes, first_phases = sample_signal_parameters(seed=DEFAULTS.random_seed)
-    second_amplitudes, second_phases = sample_signal_parameters(seed=DEFAULTS.random_seed)
+    second_amplitudes, second_phases = sample_signal_parameters(
+        seed=DEFAULTS.random_seed,
+    )
 
-    first_signals = generate_clean_signals(amplitudes=first_amplitudes, phases=first_phases)
+    first_signals = generate_clean_signals(
+        amplitudes=first_amplitudes,
+        phases=first_phases,
+    )
     second_signals = generate_clean_signals(
         amplitudes=second_amplitudes,
         phases=second_phases,

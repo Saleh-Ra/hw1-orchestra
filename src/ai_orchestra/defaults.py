@@ -46,7 +46,10 @@ class PipelineDefaults:
         if self.batch_size <= 0:
             msg = "Batch size must be positive."
             raise ValueError(msg)
-        if self.amplitude_range[0] <= 0 or self.amplitude_range[0] >= self.amplitude_range[1]:
+        if (
+            self.amplitude_range[0] <= 0
+            or self.amplitude_range[0] >= self.amplitude_range[1]
+        ):
             msg = "Amplitude range must be positive and increasing."
             raise ValueError(msg)
         if self.phase_range != (0.0, tau):

@@ -98,7 +98,7 @@ Milestone 2 validation:
 - Defaults live in `src/ai_orchestra/defaults.py` as a small dataclass.
 - The package exports `DEFAULTS` and `PipelineDefaults`.
 - Local Python compilation and default validation pass.
-- Full pytest/Ruff commands are still blocked until `uv` or local dev dependencies are available.
+- Full local pytest/Ruff commands pass in `.venv`.
 
 ### Phase B: Signal Generation Core
 
@@ -127,7 +127,7 @@ Milestone 3 validation:
 - `make_time_axis()` creates `10000` samples starting at `0.0` with a `0.001` second step.
 - `generate_clean_signal()` returns a finite NumPy array with shape `(10000,)`.
 - Local Python compilation and direct signal sanity checks pass.
-- Full pytest/Ruff commands are still blocked until `uv` or local dev dependencies are available.
+- Full local pytest/Ruff commands pass in `.venv`.
 
 ## Milestone 4: Generate Four Clean Signals
 
@@ -364,7 +364,7 @@ Milestone 13 validation:
 - Dataset indexing orders examples by window position, then target class.
 - Each item is implemented as noisy mixed window plus one-hot condition and matching clean target window.
 - Local Python compilation and dataset length/index metadata checks pass.
-- PyTorch is not installed locally, so tensor-return tests are written but will execute fully after dependencies are installed.
+- PyTorch tensor-return tests pass in `.venv`.
 
 ## Milestone 14: Dataset Size Checks
 
@@ -430,9 +430,9 @@ Milestone 16 validation:
 - Training loader uses `shuffle=True`.
 - Test loader uses `shuffle=False`.
 - Default batch size is `64` via `DEFAULTS.batch_size`.
-- DataLoader tests are written to fetch batches and check shapes/finite tensors once PyTorch is installed.
+- DataLoader tests fetch batches and check shapes/finite tensors.
 - Local Python compilation and direct DataLoader import/default checks pass.
-- PyTorch is not installed locally, so full batch-fetch validation is dependency-blocked for now.
+- Full local pytest/Ruff commands pass in `.venv`.
 
 ### Phase E: First Fully Connected Baseline
 
@@ -440,125 +440,198 @@ Good commit scope: FC model, training loop, overfit check, first real FC baselin
 
 ## Milestone 17: Build The First FC Model
 
-- [ ] Create `src/ai_orchestra/models.py`.
-- [ ] Add `FullyConnectedSignalNet`.
-- [ ] Set input size to `14`.
-- [ ] Set output size to `10`.
-- [ ] Add one hidden layer first.
-- [ ] Use ReLU activation.
-- [ ] Keep the model simple for the first run.
-- [ ] Run one fake batch through the model.
-- [ ] Confirm output shape is `(batch_size, 10)`.
-- [ ] Test model forward pass.
-- [ ] Test model output contains finite values.
+- [x] Create `src/ai_orchestra/models.py`.
+- [x] Add `FullyConnectedSignalNet`.
+- [x] Set input size to `14`.
+- [x] Set output size to `10`.
+- [x] Add one hidden layer first.
+- [x] Use ReLU activation.
+- [x] Keep the model simple for the first run.
+- [x] Run one fake batch through the model.
+- [x] Confirm output shape is `(batch_size, 10)`.
+- [x] Test model forward pass.
+- [x] Test model output contains finite values.
+
+Milestone 17 validation:
+
+- `FullyConnectedSignalNet` lives in `src/ai_orchestra/models.py`.
+- The model uses a simple `14 -> 64 -> 10` ReLU network.
+- Model tests are written for fake-batch forward shape and finite outputs.
+- Local Python compilation passes.
+- Base package import still works without PyTorch installed.
+- Fake-batch forward tests pass in `.venv`.
 
 ## Milestone 18: Minimal Training Loop
 
-- [ ] Create `src/ai_orchestra/training.py`.
-- [ ] Add a function to train one epoch.
-- [ ] Add a function to evaluate one epoch.
-- [ ] Use MSE loss.
-- [ ] Use Adam optimizer.
-- [ ] Move model to CPU by default.
-- [ ] Support GPU if available without requiring it.
-- [ ] Track average train loss.
-- [ ] Track average test loss.
-- [ ] Print or return epoch metrics.
-- [ ] Train the FC model for one epoch on a tiny subset.
-- [ ] Confirm the training loop does not crash.
-- [ ] Confirm loss is finite.
-- [ ] Add an integration smoke test for one tiny FC training run.
+- [x] Create `src/ai_orchestra/training.py`.
+- [x] Add a function to train one epoch.
+- [x] Add a function to evaluate one epoch.
+- [x] Use MSE loss.
+- [x] Use Adam optimizer.
+- [x] Move model to CPU by default.
+- [x] Support GPU if available without requiring it.
+- [x] Track average train loss.
+- [x] Track average test loss.
+- [x] Print or return epoch metrics.
+- [x] Train the FC model for one epoch on a tiny subset.
+- [x] Confirm the training loop does not crash.
+- [x] Confirm loss is finite.
+- [x] Add an integration smoke test for one tiny FC training run.
+
+Milestone 18 validation:
+
+- `train_one_epoch()` trains one model epoch and returns average MSE loss.
+- `evaluate_one_epoch()` evaluates one model epoch and returns average MSE loss.
+- `create_adam_optimizer()` creates the default Adam optimizer.
+- Device handling defaults to CPU and uses CUDA if available when no device is provided.
+- Unit and integration smoke tests are written for one tiny FC training run.
+- Local Python compilation and package import checks pass.
+- Tiny FC training smoke tests pass in `.venv`.
 
 ## Milestone 19: First Overfit Test
 
-- [ ] Create a tiny dataset from one or two generated signal sets.
-- [ ] Train the FC model on a very small subset.
-- [ ] Use enough epochs to see if the model can overfit.
-- [ ] Track training loss.
-- [ ] Confirm training loss decreases.
-- [ ] Plot one prediction from the overfit run.
-- [ ] Compare predicted window to target window.
-- [ ] If it cannot overfit, inspect dataset indexing.
-- [ ] If it cannot overfit, inspect target mapping.
-- [ ] If it cannot overfit, inspect model output shape.
-- [ ] If it cannot overfit, inspect loss calculation.
-- [ ] Do not move to larger training until this works.
+- [x] Create a tiny dataset from one or two generated signal sets.
+- [x] Train the FC model on a very small subset.
+- [x] Use enough epochs to see if the model can overfit.
+- [x] Track training loss.
+- [x] Confirm training loss decreases.
+- [x] Plot one prediction from the overfit run.
+- [x] Compare predicted window to target window.
+- [x] If it cannot overfit, inspect dataset indexing.
+- [x] If it cannot overfit, inspect target mapping.
+- [x] If it cannot overfit, inspect model output shape.
+- [x] If it cannot overfit, inspect loss calculation.
+- [x] Do not move to larger training until this works.
+
+Milestone 19 validation:
+
+- `run_fc_overfit_check()` lives in `src/ai_orchestra/overfit.py`.
+- The overfit check creates one small signal set and trains on a tiny subset.
+- It records training losses across epochs.
+- It returns one prediction and target window for inspection.
+- It saves a prediction-vs-target plot when an output path is provided.
+- Integration tests check loss decrease, finite outputs, and plot creation.
+- Local Python compilation and package import checks pass.
+- Overfit integration tests pass in `.venv`.
 
 ## Milestone 20: First Real FC Baseline
 
-- [ ] Generate many signal sets for training.
-- [ ] Start with fewer than `50` sets if runtime is too high.
-- [ ] Increase toward `50` sets after the pipeline works.
-- [ ] Build the FC dataset.
-- [ ] Build train and test splits.
-- [ ] Train the FC model for a small number of epochs.
-- [ ] Record train loss per epoch.
-- [ ] Record test loss per epoch.
-- [ ] Confirm train loss decreases.
-- [ ] Confirm test loss is finite.
-- [ ] Save the loss history in memory first.
-- [ ] Save metrics to disk only after the run works.
-- [ ] Inspect several predictions.
-- [ ] Confirm predictions roughly follow the target signal.
-- [ ] Note failure modes if reconstruction is poor.
+- [x] Generate many signal sets for training.
+- [x] Start with fewer than `50` sets if runtime is too high.
+- [x] Increase toward `50` sets after the pipeline works.
+- [x] Build the FC dataset.
+- [x] Build train and test splits.
+- [x] Train the FC model for a small number of epochs.
+- [x] Record train loss per epoch.
+- [x] Record test loss per epoch.
+- [x] Confirm train loss decreases.
+- [x] Confirm test loss is finite.
+- [x] Save the loss history in memory first.
+- [x] Save metrics to disk only after the run works.
+- [x] Inspect several predictions.
+- [ ] Confirm predictions roughly follow the target signal in a stronger run.
+- [x] Note failure modes if reconstruction is poor.
+
+Milestone 20 implementation status:
+
+- `run_fc_baseline()` lives in `src/ai_orchestra/baseline.py`.
+- It generates signal sets, builds the FC dataset, creates train/test splits, trains for configurable epochs, and records train/test losses in memory.
+- It supports starting with fewer than `50` signal sets via `signal_set_count`.
+- It returns several prediction/target windows for inspection.
+- It intentionally does not save metrics to disk yet.
+- Integration tests check baseline losses, predictions, and validation errors.
+- Local Python compilation and package import checks pass.
+- A small manual FC baseline run showed decreasing train/test losses and finite predictions.
+- Milestone 21 plots show the short toy run learns in loss terms but predictions are still visibly poor.
 
 ## Milestone 21: FC Prediction Plots
 
-- [ ] Add a function to plot target vs. prediction.
-- [ ] Plot a prediction for `S1`.
-- [ ] Plot a prediction for `S2`.
-- [ ] Plot a prediction for `S3`.
-- [ ] Plot a prediction for `S4`.
-- [ ] Include the model name in the plot title.
-- [ ] Include the requested frequency in the plot title.
-- [ ] Save plots under `results/figures/`.
-- [ ] Visually inspect all four FC prediction plots.
-- [ ] Add a function to plot training and test loss curves.
-- [ ] Save the FC loss curve.
-- [ ] Use these plots to decide whether the FC baseline is good enough.
+- [x] Add a function to plot target vs. prediction.
+- [x] Plot a prediction for `S1`.
+- [x] Plot a prediction for `S2`.
+- [x] Plot a prediction for `S3`.
+- [x] Plot a prediction for `S4`.
+- [x] Include the model name in the plot title.
+- [x] Include the requested frequency in the plot title.
+- [x] Save plots under `results/figures/`.
+- [x] Visually inspect all four FC prediction plots.
+- [x] Add a function to plot training and test loss curves.
+- [x] Save the FC loss curve.
+- [x] Use these plots to decide whether the FC baseline is good enough.
+
+Milestone 21 validation:
+
+- `fc_plotting.py` saves target-vs-prediction windows and loss curves.
+- Baseline prediction sampling now selects one example per class when possible.
+- Generated plots live under `results/figures/fc_baseline/`.
+- The 5-epoch toy run loss decreases, but prediction plots are not close enough yet.
+- Full local pytest and Ruff pass.
 
 ## Milestone 22: Minimal SDK Or Runner
 
-- [ ] Create a simple runnable entry point.
-- [ ] Prefer a small SDK function before adding a full CLI.
-- [ ] Create `src/ai_orchestra/sdk.py`.
-- [ ] Add a function to run signal generation.
-- [ ] Add a function to build datasets.
-- [ ] Add a function to train the FC baseline.
-- [ ] Add a function to plot FC predictions.
-- [ ] Create a simple script only if needed for convenience.
-- [ ] Ensure the runner calls package functions instead of duplicating logic.
-- [ ] Run the full minimal FC pipeline from one place.
-- [ ] Confirm the run produces metrics and plots.
+- [x] Create a simple runnable entry point.
+- [x] Prefer a small SDK function before adding a full CLI.
+- [x] Create `src/ai_orchestra/sdk.py`.
+- [x] Add a function to run signal generation.
+- [x] Add a function to build datasets.
+- [x] Add a function to train the FC baseline.
+- [x] Add a function to plot FC predictions.
+- [x] Create a simple script only if needed for convenience.
+- [x] Ensure the runner calls package functions instead of duplicating logic.
+- [x] Run the full minimal FC pipeline from one place.
+- [x] Confirm the run produces metrics and plots.
+
+Milestone 22 validation:
+
+- `sdk.py` provides reusable package entry points for generation, dataset building, FC training, plotting, and one-call minimal pipeline execution.
+- `python -m ai_orchestra` runs the current quick FC baseline and prints metrics plus generated plot paths.
+- The runner reuses existing package functions rather than duplicating pipeline logic.
+- The quick run produces metrics and plots under `results/figures/fc_baseline/`.
 
 ## Milestone 23: Minimal README Update
 
-- [ ] Create or update `README.md`.
-- [ ] Explain the project in one paragraph.
-- [ ] Explain the minimal pipeline.
-- [ ] Explain how signals are generated.
-- [ ] Explain how the one-hot condition works.
-- [ ] Explain how to run tests.
-- [ ] Explain how to run the FC baseline.
-- [ ] Add the current FC result after it exists.
-- [ ] Add at least one prediction plot after it exists.
-- [ ] Keep README honest about what is implemented so far.
+- [x] Create or update `README.md`.
+- [x] Explain the project in one paragraph.
+- [x] Explain the minimal pipeline.
+- [x] Explain how signals are generated.
+- [x] Explain how the one-hot condition works.
+- [x] Explain how to run tests.
+- [x] Explain how to run the FC baseline.
+- [x] Add the current FC result after it exists.
+- [x] Add at least one prediction plot after it exists.
+- [x] Keep README honest about what is implemented so far.
+
+Milestone 23 validation:
+
+- `README.md` now documents setup with `.venv` and `requirements.txt`.
+- It documents `python -m ai_orchestra` as the current runner.
+- It lists the generated FC prediction and loss plot paths.
+- It states that the quick FC loss decreases but prediction quality still needs review.
 
 ## Milestone 24: FC Baseline Review Gate
 
-- [ ] Confirm signal generation works.
-- [ ] Confirm many signal sets are generated.
-- [ ] Confirm dataset indexing works.
-- [ ] Confirm FC model trains without crashing.
-- [ ] Confirm FC training loss decreases.
-- [ ] Confirm FC test loss is finite.
-- [ ] Confirm FC prediction plots are generated.
+- [x] Confirm signal generation works.
+- [x] Confirm many signal sets are generated.
+- [x] Confirm dataset indexing works.
+- [x] Confirm FC model trains without crashing.
+- [x] Confirm FC training loss decreases.
+- [x] Confirm FC test loss is finite.
+- [x] Confirm FC prediction plots are generated.
 - [ ] Confirm at least some FC predictions visually resemble targets.
-- [ ] Run all tests.
-- [ ] Run Ruff.
-- [ ] Fix any easy issues.
-- [ ] Decide whether to improve FC before adding RNN.
-- [ ] Do not add RNN before this gate is passed.
+- [x] Run all tests.
+- [x] Run Ruff.
+- [x] Fix any easy issues.
+- [x] Decide whether to improve FC before adding RNN.
+- [x] Do not add RNN before this gate is passed.
+
+Milestone 24 review result:
+
+- The package runner completes and generates metrics plus FC plots.
+- Full pytest passes with `115` tests.
+- Ruff passes.
+- Train loss decreases from about `0.635` to `0.505`; test loss decreases from about `0.671` to `0.515`.
+- Signal generation, many-set generation, dataset indexing, model training, and plotting are covered by tests and the runner.
+- The FC prediction plots are still visibly poor, so the review gate says to improve or strengthen the FC baseline before adding RNN/LSTM models.
 
 ### Phase F: Sequence Models
 

@@ -25,7 +25,10 @@ def test_generated_signal_sets_keep_frequency_order() -> None:
     defaults = PipelineDefaults(num_signal_sets=2, num_samples=100)
     signal_sets = generate_signal_sets(defaults=defaults, seed=DEFAULTS.random_seed)
 
-    assert all(signal_set.frequencies_hz == defaults.frequencies_hz for signal_set in signal_sets)
+    assert all(
+        signal_set.frequencies_hz == defaults.frequencies_hz
+        for signal_set in signal_sets
+    )
 
 
 def test_generated_signal_sets_are_not_identical() -> None:

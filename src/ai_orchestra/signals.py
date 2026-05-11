@@ -11,7 +11,8 @@ from .defaults import DEFAULTS, PipelineDefaults
 def make_time_axis(defaults: PipelineDefaults = DEFAULTS) -> NDArray[np.float64]:
     """Create sample times from the sampling frequency and sample count."""
     defaults.validate()
-    return np.arange(defaults.num_samples, dtype=np.float64) / defaults.sampling_frequency_hz
+    samples = np.arange(defaults.num_samples, dtype=np.float64)
+    return samples / defaults.sampling_frequency_hz
 
 
 def generate_clean_signal(

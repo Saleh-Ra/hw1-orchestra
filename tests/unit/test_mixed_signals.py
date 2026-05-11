@@ -47,7 +47,8 @@ def test_mixed_signals_contain_finite_values() -> None:
 
 def test_clean_and_noisy_mixed_signals_differ_when_noise_is_enabled() -> None:
     amplitudes, phases = sample_signal_parameters(seed=DEFAULTS.random_seed)
-    clean_mix = combine_signals(generate_clean_signals(amplitudes=amplitudes, phases=phases))
+    clean_signals = generate_clean_signals(amplitudes=amplitudes, phases=phases)
+    clean_mix = combine_signals(clean_signals)
     noisy_mix = combine_signals(
         generate_noisy_signals(
             amplitudes=amplitudes,

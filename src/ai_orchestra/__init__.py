@@ -1,6 +1,6 @@
 """Tools for conditioned sine-signal reconstruction experiments."""
 
-from ai_orchestra.defaults import DEFAULTS, PipelineDefaults
+from .defaults import DEFAULTS, PipelineDefaults
 
 __version__ = "0.1.0"
 

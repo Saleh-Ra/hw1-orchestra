@@ -98,21 +98,28 @@ Milestone 2 validation:
 
 ## Milestone 3: Generate One Clean Signal
 
-- [ ] Create `src/ai_orchestra/signals.py`.
-- [ ] Add a function to create a time axis.
-- [ ] Test that the time axis length is `10000`.
-- [ ] Test that the first time value is `0`.
-- [ ] Test that the time step matches `1 / 1000`.
-- [ ] Add a function to generate a clean sine signal.
-- [ ] Pass frequency into the clean signal function.
-- [ ] Pass amplitude into the clean signal function.
-- [ ] Pass phase into the clean signal function.
-- [ ] Return a NumPy array from the clean signal function.
-- [ ] Test that one generated clean signal has shape `(10000,)`.
-- [ ] Test that the clean signal contains finite values.
-- [ ] Test that changing frequency changes the signal.
-- [ ] Test that changing phase changes the signal.
-- [ ] Test that changing amplitude changes the signal scale.
+- [x] Create `src/ai_orchestra/signals.py`.
+- [x] Add a function to create a time axis.
+- [x] Test that the time axis length is `10000`.
+- [x] Test that the first time value is `0`.
+- [x] Test that the time step matches `1 / 1000`.
+- [x] Add a function to generate a clean sine signal.
+- [x] Pass frequency into the clean signal function.
+- [x] Pass amplitude into the clean signal function.
+- [x] Pass phase into the clean signal function.
+- [x] Return a NumPy array from the clean signal function.
+- [x] Test that one generated clean signal has shape `(10000,)`.
+- [x] Test that the clean signal contains finite values.
+- [x] Test that changing frequency changes the signal.
+- [x] Test that changing phase changes the signal.
+- [x] Test that changing amplitude changes the signal scale.
+
+Milestone 3 validation:
+
+- `make_time_axis()` creates `10000` samples starting at `0.0` with a `0.001` second step.
+- `generate_clean_signal()` returns a finite NumPy array with shape `(10000,)`.
+- Local Python compilation and direct signal sanity checks pass.
+- Full pytest/Ruff commands are still blocked until `uv` or local dev dependencies are available.
 
 ## Milestone 4: Generate Four Clean Signals
 

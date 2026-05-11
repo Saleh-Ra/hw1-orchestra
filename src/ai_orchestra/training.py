@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from .prediction_sampling import resolve_device
+
 
 def create_adam_optimizer(
     model: Any,
@@ -26,7 +28,7 @@ def train_one_epoch(
     """Train a model for one epoch and return average MSE loss."""
     import torch
 
-    training_device = _resolve_device(device)
+    training_device = resolve_device(device)
     loss_fn = torch.nn.MSELoss()
     model.to(training_device)
     model.train()
@@ -56,7 +58,7 @@ def evaluate_one_epoch(
     """Evaluate a model for one epoch and return average MSE loss."""
     import torch
 
-    evaluation_device = _resolve_device(device)
+    evaluation_device = resolve_device(device)
     loss_fn = torch.nn.MSELoss()
     model.to(evaluation_device)
     model.eval()
@@ -74,15 +76,6 @@ def evaluate_one_epoch(
             total_items += batch_size
 
     return _average_loss(total_loss, total_items)
-
-
-def _resolve_device(device: str | None) -> str:
-    if device is not None:
-        return device
-
-    import torch
-
-    return "cuda" if torch.cuda.is_available() else "cpu"
 
 
 def _average_loss(total_loss: float, total_items: int) -> float:

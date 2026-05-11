@@ -207,18 +207,26 @@ Milestone 7 validation:
 
 ## Milestone 8: Represent One Signal Set
 
-- [ ] Add a small `SignalSet` dataclass.
-- [ ] Store the time axis.
-- [ ] Store the frequencies.
-- [ ] Store the clean signals.
-- [ ] Store the noisy signals.
-- [ ] Store the clean mixed signal.
-- [ ] Store the noisy mixed signal.
-- [ ] Store amplitudes if useful for debugging.
-- [ ] Store phases if useful for debugging.
-- [ ] Add a function that returns one complete `SignalSet`.
-- [ ] Test that `SignalSet` fields have expected shapes.
-- [ ] Test that one complete signal set can be generated with one function call.
+- [x] Add a small `SignalSet` dataclass.
+- [x] Store the time axis.
+- [x] Store the frequencies.
+- [x] Store the clean signals.
+- [x] Store the noisy signals.
+- [x] Store the clean mixed signal.
+- [x] Store the noisy mixed signal.
+- [x] Store amplitudes if useful for debugging.
+- [x] Store phases if useful for debugging.
+- [x] Add a function that returns one complete `SignalSet`.
+- [x] Test that `SignalSet` fields have expected shapes.
+- [x] Test that one complete signal set can be generated with one function call.
+
+Milestone 8 validation:
+
+- `SignalSet` lives in `src/ai_orchestra/signal_sets.py`.
+- `generate_signal_set()` returns time axis, frequencies, amplitudes, phases, clean/noisy signals, and clean/noisy mixes.
+- Signal set fields have the expected shapes.
+- Seeded signal set generation is reproducible.
+- Local Python compilation and direct signal-set sanity checks pass.
 
 ## Milestone 9: Generate Many Signal Sets
 

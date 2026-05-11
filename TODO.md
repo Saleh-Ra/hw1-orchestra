@@ -123,17 +123,24 @@ Milestone 3 validation:
 
 ## Milestone 4: Generate Four Clean Signals
 
-- [ ] Add a function to generate all four clean signals.
-- [ ] Generate `S1` at `1 Hz`.
-- [ ] Generate `S2` at `3 Hz`.
-- [ ] Generate `S3` at `5 Hz`.
-- [ ] Generate `S4` at `7 Hz`.
-- [ ] Store clean signals in frequency order.
-- [ ] Return clean signals with shape `(4, 10000)`.
-- [ ] Test the clean signal stack shape.
-- [ ] Test that four frequencies are represented.
-- [ ] Test that generated signals are not all identical.
-- [ ] Test that clean signal generation is reproducible with a seed.
+- [x] Add a function to generate all four clean signals.
+- [x] Generate `S1` at `1 Hz`.
+- [x] Generate `S2` at `3 Hz`.
+- [x] Generate `S3` at `5 Hz`.
+- [x] Generate `S4` at `7 Hz`.
+- [x] Store clean signals in frequency order.
+- [x] Return clean signals with shape `(4, 10000)`.
+- [x] Test the clean signal stack shape.
+- [x] Test that four frequencies are represented.
+- [x] Test that generated signals are not all identical.
+- [x] Test that clean signal generation is deterministic before random sampling is added.
+
+Milestone 4 validation:
+
+- `generate_clean_signals()` returns a clean signal stack with shape `(4, 10000)`.
+- Signal rows follow the configured frequency order: `1 Hz`, `3 Hz`, `5 Hz`, `7 Hz`.
+- Local Python compilation and direct clean-stack sanity checks pass.
+- Seed-controlled random amplitude and phase generation starts in Milestone 5.
 
 ## Milestone 5: Add Random Amplitude And Phase
 

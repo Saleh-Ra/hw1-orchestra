@@ -60,7 +60,12 @@ def test_changing_frequency_changes_signal() -> None:
 def test_changing_phase_changes_signal() -> None:
     time_axis = make_time_axis()
     zero_phase = generate_clean_signal(1.0, time_axis, amplitude=1.0, phase=0.0)
-    shifted_phase = generate_clean_signal(1.0, time_axis, amplitude=1.0, phase=np.pi / 2)
+    shifted_phase = generate_clean_signal(
+        1.0,
+        time_axis,
+        amplitude=1.0,
+        phase=np.pi / 2,
+    )
 
     assert not np.allclose(zero_phase, shifted_phase)
 

@@ -1,5 +1,9 @@
 from ai_orchestra import DEFAULTS, PipelineDefaults, generate_signal_set
-from ai_orchestra.plotting import plot_mixed_signal, plot_raw_signal_examples, plot_signal_stack
+from ai_orchestra.plotting import (
+    plot_mixed_signal,
+    plot_raw_signal_examples,
+    plot_signal_stack,
+)
 
 
 def test_plot_signal_stack_saves_file(tmp_path) -> None:

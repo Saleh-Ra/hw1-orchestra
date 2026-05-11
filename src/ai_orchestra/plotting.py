@@ -66,7 +66,10 @@ def plot_mixed_signal(
     return output
 
 
-def plot_raw_signal_examples(signal_set: SignalSet, output_dir: str | Path) -> list[Path]:
+def plot_raw_signal_examples(
+    signal_set: SignalSet,
+    output_dir: str | Path,
+) -> list[Path]:
     """Save clean, noisy, clean-mix, and noisy-mix raw signal examples."""
     output_root = Path(output_dir)
     return [

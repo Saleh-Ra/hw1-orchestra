@@ -1,0 +1,76 @@
+{
+  "experiments": [
+    {
+      "name": "noise_low",
+      "description": "Reduce all three noise strengths to a quiet regime.",
+      "overrides": {
+        "amplitude_noise_std": 0.02,
+        "phase_noise_std": 0.02,
+        "additive_noise_std": 0.005
+      }
+    },
+    {
+      "name": "noise_medium",
+      "description": "Project default noise level; useful as a labeled baseline.",
+      "overrides": {
+        "amplitude_noise_std": 0.10,
+        "phase_noise_std": 0.10,
+        "additive_noise_std": 0.02
+      }
+    },
+    {
+      "name": "noise_high",
+      "description": "Heavier noise on amplitude, phase, and additive paths.",
+      "overrides": {
+        "amplitude_noise_std": 0.30,
+        "phase_noise_std": 0.30,
+        "additive_noise_std": 0.05
+      }
+    },
+    {
+      "name": "hidden_small",
+      "description": "Shrink RNN/LSTM hidden size to a small bottleneck.",
+      "overrides": {"hidden_size": 8}
+    },
+    {
+      "name": "hidden_large",
+      "description": "Grow RNN/LSTM hidden size to test extra capacity.",
+      "overrides": {"hidden_size": 128}
+    },
+    {
+      "name": "layers_one",
+      "description": "Default single-layer recurrent stack.",
+      "overrides": {"num_layers": 1}
+    },
+    {
+      "name": "layers_two",
+      "description": "Two stacked recurrent layers for RNN and LSTM.",
+      "overrides": {"num_layers": 2}
+    },
+    {
+      "name": "window_10",
+      "description": "Default 10-sample window.",
+      "overrides": {"window_size": 10}
+    },
+    {
+      "name": "window_large",
+      "description": "Longer window so the recurrent models see more signal.",
+      "overrides": {"window_size": 25}
+    },
+    {
+      "name": "split_80_20",
+      "description": "Default train/test split as a labeled baseline.",
+      "overrides": {"train_ratio": 0.8}
+    },
+    {
+      "name": "split_70_30",
+      "description": "Smaller training set, larger held-out test set.",
+      "overrides": {"train_ratio": 0.7}
+    },
+    {
+      "name": "split_90_10",
+      "description": "Larger training set, tighter held-out test set.",
+      "overrides": {"train_ratio": 0.9}
+    }
+  ]
+}

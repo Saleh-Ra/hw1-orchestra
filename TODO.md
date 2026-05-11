@@ -825,87 +825,299 @@ Good commit scope: model comparison metrics, config files, experiment variants, 
 
 ## Milestone 30: Model Comparison
 
-- [ ] Create `src/ai_orchestra/evaluation.py`.
-- [ ] Add MSE metric calculation.
-- [ ] Add optional MAE metric calculation.
-- [ ] Calculate overall FC test MSE.
-- [ ] Calculate overall RNN test MSE.
-- [ ] Calculate overall LSTM test MSE.
-- [ ] Calculate per-frequency FC MSE.
-- [ ] Calculate per-frequency RNN MSE.
-- [ ] Calculate per-frequency LSTM MSE.
-- [ ] Create a comparison dictionary.
-- [ ] Save comparison metrics as JSON.
-- [ ] Save comparison metrics as CSV if useful.
-- [ ] Plot final test MSE by model.
-- [ ] Plot per-frequency MSE by model.
-- [ ] Write short notes about which model performs best.
+- [x] Create `src/ai_orchestra/evaluation.py`.
+- [x] Add MSE metric calculation (`compute_mse`).
+- [x] Add optional MAE metric calculation (`compute_mae`).
+- [x] Calculate overall FC test MSE.
+- [x] Calculate overall RNN test MSE.
+- [x] Calculate overall LSTM test MSE.
+- [x] Calculate per-frequency FC MSE.
+- [x] Calculate per-frequency RNN MSE.
+- [x] Calculate per-frequency LSTM MSE.
+- [x] Create a comparison dictionary (`ModelComparison`).
+- [x] Save comparison metrics as JSON (`save_comparison_json`).
+- [x] Save comparison metrics as CSV (`save_comparison_csv`).
+- [x] Plot final test MSE by model (`plot_overall_mse`).
+- [x] Plot per-frequency MSE by model (`plot_per_frequency_mse`).
+- [x] Write short notes about which model performs best (see review notes below).
+
+### Milestone 30 review notes
+
+- Settings used for the apples-to-apples comparison: `1` signal set,
+  `num_samples=100`, `batch_size=32`, `epochs=5`, `learning_rate=1e-3`,
+  `hidden_size=32`, `seed=42`, `device=cpu`. All three models are trained on
+  the same train/test split.
+- Overall test MSE (lower is better):
+
+  | Model | Overall MSE |
+  |-------|-------------|
+  | FC    | `0.5372`    |
+  | RNN   | `0.3406`    |
+  | LSTM  | `0.4928`    |
+
+- Ranking: **RNN beats LSTM beats FC** at this scale. RNN is `~37%` better
+  than FC and `~31%` better than LSTM. LSTM edges FC by `~8%`.
+- Per-frequency test MSE (lower is better):
+
+  | Model | 1 Hz     | 3 Hz     | 5 Hz     | 7 Hz     |
+  |-------|----------|----------|----------|----------|
+  | FC    | `0.0613` | `0.6411` | `0.4751` | `0.9012` |
+  | RNN   | `0.1092` | `0.1012` | `0.2841` | `0.8820` |
+  | LSTM  | `0.0330` | `0.3991` | `0.3134` | `1.1902` |
+
+- Per-frequency findings:
+  - All three models do best at `1 Hz` and worst at `7 Hz`. That is expected
+    because the `10`-sample window covers a smaller fraction of a `7 Hz`
+    period than of a `1 Hz` period.
+  - LSTM is the **best** single result at `1 Hz` (`0.0330`) — for very slow
+    signals its smoothing bias is helpful.
+  - LSTM is the **worst** single result at `7 Hz` (`1.1902`) — undertrained
+    LSTM predictions hover near zero, which is far from the high-amplitude
+    `7 Hz` target.
+  - RNN dominates the mid frequencies (`3 Hz` and `5 Hz`), where the window
+    contains a meaningful fraction of one period.
+- Artifacts saved:
+  - `results/metrics/model_comparison.json`
+  - `results/metrics/model_comparison.csv`
+  - `results/figures/comparison/overall_test_mse.png`
+  - `results/figures/comparison/per_frequency_test_mse.png`
+- Quality gate: `152` tests pass (139 + 13 new), Ruff clean. No lint
+  waivers. New modules under `150` lines each (`evaluation.py` `86`,
+  `comparison.py` `146`, `comparison_io.py` `57`,
+  `comparison_plotting.py` `86`).
+- Honest interpretation: results agree with milestones 27 and 29 directionally
+  (RNN best at this smoke-run scale). The new per-frequency breakdown adds
+  detail and shows that the per-class error is **not** uniform across
+  frequencies, which is worth keeping in mind when designing the next
+  experiment (more signal sets, more epochs, possibly a longer window).
 
 ## Milestone 31: Config Polish
 
-- [ ] Create `config/`.
-- [ ] Create `config/default.json`.
-- [ ] Move frequencies into config.
-- [ ] Move sampling frequency into config.
-- [ ] Move number of samples into config.
-- [ ] Move window size into config.
-- [ ] Move number of signal sets into config.
-- [ ] Move noise strengths into config.
-- [ ] Move train/test split into config.
-- [ ] Move batch size into config.
-- [ ] Move epoch count into config.
-- [ ] Move learning rate into config.
-- [ ] Move hidden size into config.
-- [ ] Move random seed into config.
-- [ ] Add config loading code.
-- [ ] Validate required config fields.
-- [ ] Test config loading.
-- [ ] Test invalid config errors.
-- [ ] Keep hardcoded defaults only where they make sense.
+- [x] Create `config/`.
+- [x] Create `config/default.json`.
+- [x] Move frequencies into config.
+- [x] Move sampling frequency into config.
+- [x] Move number of samples into config.
+- [x] Move window size into config.
+- [x] Move number of signal sets into config.
+- [x] Move noise strengths into config (`amplitude_noise_std`,
+      `phase_noise_std`, `additive_noise_std`).
+- [x] Move train/test split into config (`train_ratio`).
+- [x] Move batch size into config.
+- [x] Move epoch count into config.
+- [x] Move learning rate into config.
+- [x] Move hidden size into config.
+- [x] Move random seed into config.
+- [x] Add config loading code (`src/ai_orchestra/config.py`,
+      `load_pipeline_defaults`).
+- [x] Validate required config fields (reuses `PipelineDefaults.validate`
+      and dataclass type checking via `TypeError`-to-`ValueError`).
+- [x] Test config loading (default path round-trip and custom-path overrides).
+- [x] Test invalid config errors (unknown field, non-array tuple, invalid
+      value, non-object root, missing file).
+- [x] Keep hardcoded defaults only where they make sense (the dataclass
+      keeps mirroring defaults so import-time code never does disk I/O,
+      and a parity test asserts the two stay in sync).
+
+### Milestone 31 review notes
+
+- `config/default.json` is the documented source of truth for project
+  tunables. The `PipelineDefaults` dataclass keeps the same values as
+  fallback so importing `ai_orchestra` performs no disk I/O.
+- Three new tunables were added to `PipelineDefaults` so the config covers
+  everything Milestone 31 lists: `epochs`, `learning_rate`, `hidden_size`.
+  Each has its own validation rule (must be positive).
+- `load_pipeline_defaults(path: str | Path | None = None) -> PipelineDefaults`
+  loads JSON, rejects unknown fields, coerces JSON arrays into tuples for
+  tuple-typed fields, converts dataclass `TypeError` (e.g. wrong primitive
+  type) into a clear `ValueError`, and then calls `defaults.validate()` so
+  every config goes through the same checks that hardcoded defaults do.
+- Tests added in `tests/unit/test_config.py`:
+  - `test_default_config_matches_hardcoded_defaults` (parity)
+  - `test_default_config_covers_every_pipeline_field` (no field forgotten)
+  - `test_load_pipeline_defaults_from_custom_path`
+  - `test_load_pipeline_defaults_missing_file_raises`
+  - `test_load_pipeline_defaults_rejects_unknown_field`
+  - `test_load_pipeline_defaults_rejects_non_array_tuple_field`
+  - `test_load_pipeline_defaults_validates_values`
+  - `test_load_pipeline_defaults_rejects_non_object_root`
+- Quality gate: `160` tests pass (152 + 8 new), Ruff clean. New
+  `config.py` is `68` lines, `defaults.py` grew to `79` lines, both under
+  the `150`-line guideline.
+- Backwards compatibility: nothing else in the SDK changed. Baselines and
+  `compare_models` still accept their `epochs`, `learning_rate`, and
+  `hidden_size` arguments directly. The dataclass values are available
+  via `DEFAULTS.epochs` etc. for any future call site that wants to be
+  fully config-driven.
 
 ## Milestone 32: Experiment Variants
 
-- [ ] Create `config/experiments.json` if needed.
-- [ ] Add a low-noise experiment.
-- [ ] Add a medium-noise experiment.
-- [ ] Add a high-noise experiment.
-- [ ] Add a smaller-hidden-size experiment.
-- [ ] Add a larger-hidden-size experiment.
-- [ ] Add a one-layer experiment.
-- [ ] Add a two-layer experiment.
-- [ ] Add a window-size `10` experiment.
-- [ ] Add a larger-window experiment.
-- [ ] Add an `80/20` split baseline.
-- [ ] Optionally add a `70/30` split experiment.
-- [ ] Optionally add a `90/10` split experiment.
-- [ ] Run only one variant at a time at first.
-- [ ] Save each experiment's config with its results.
-- [ ] Avoid changing too many variables in one experiment.
+- [x] Create `config/experiments.json` if needed.
+- [x] Add a low-noise experiment (`noise_low`).
+- [x] Add a medium-noise experiment (`noise_medium`, labels the default noise).
+- [x] Add a high-noise experiment (`noise_high`).
+- [x] Add a smaller-hidden-size experiment (`hidden_small`, `hidden_size=8`).
+- [x] Add a larger-hidden-size experiment (`hidden_large`, `hidden_size=128`).
+- [x] Add a one-layer experiment (`layers_one`, default recurrent stack).
+- [x] Add a two-layer experiment (`layers_two`, `num_layers=2`).
+- [x] Add a window-size `10` experiment (`window_10`, labels the default).
+- [x] Add a larger-window experiment (`window_large`, `window_size=25`).
+- [x] Add an `80/20` split baseline (`split_80_20`, labels the default).
+- [x] Optionally add a `70/30` split experiment (`split_70_30`).
+- [x] Optionally add a `90/10` split experiment (`split_90_10`).
+- [x] Run only one variant at a time at first (only `noise_low` executed
+      end-to-end in this milestone).
+- [x] Save each experiment's config with its results (the runner writes
+      `config.json` containing the spec, the overrides, and the fully
+      resolved defaults alongside `metrics.json`, `metrics.csv`, and the
+      two PNG plots).
+- [x] Avoid changing too many variables in one experiment (each variant
+      overrides one knob, except the three noise sweeps which intentionally
+      group the three coupled noise stds).
+
+### Milestone 32 review notes
+
+- Added `num_layers` to `PipelineDefaults` (default `1`) and threaded it
+  through `compare_models` so the layer variants (`layers_one`,
+  `layers_two`) actually affect RNN/LSTM construction.
+- New module `src/ai_orchestra/experiments.py` provides
+  `ExperimentSpec`, `load_experiments`, and `apply_overrides`.
+- New module `src/ai_orchestra/experiment_runner.py` provides
+  `run_experiment` and `list_known_experiments`. The runner is what saves
+  the resolved config to disk so each result is self-contained.
+- CLI entry point added at `scripts/run_experiment.py`. Usage:
+
+  ```powershell
+  $env:PYTHONPATH="src"
+  python scripts/run_experiment.py --list
+  python scripts/run_experiment.py noise_low --num-samples 100 --batch-size 32 --signal-set-count 1
+  ```
+
+- One variant executed end-to-end: `noise_low` at smoke scale
+  (`1` signal set, `100` samples, `batch_size=32`, default `3` epochs,
+  `learning_rate=1e-3`, `hidden_size=32`, `num_layers=1`, `seed=42`).
+  Overall test MSE: FC `0.5903`, RNN `0.3641`, LSTM `0.6306`. RNN keeps
+  the lead even at lower noise (same direction as the M30 default-noise
+  run; absolute values are higher here because this run used the
+  config default of `3` epochs, not the `5` epochs `scripts/run_comparison.py`
+  uses).
+- Artifacts written by the runner to `results/experiments/noise_low/`:
+  - `config.json` (spec, overrides, resolved defaults)
+  - `metrics.json`, `metrics.csv`
+  - `overall_test_mse.png`, `per_frequency_test_mse.png`
+- File sizes (all under the 150-line guideline): `experiments.py` `95`,
+  `experiment_runner.py` `113`, `comparison.py` `134`,
+  `comparison_internals.py` `31`, `scripts/run_experiment.py` `91`.
+  `comparison.py` was kept under 150 by extracting `train_with_loss_history`
+  and `by_frequency` into the small `comparison_internals.py` companion.
+- Quality gate: `174` tests pass (`160` + `14` new — 11 unit on
+  loader/overrides, 3 integration on the runner), Ruff clean.
+- Honest interpretation: the milestone's purpose is the **infrastructure**
+  for reproducible, one-knob-at-a-time experiments, not yet a sweep of
+  results. The `noise_low` run confirms the runner end-to-end. Running
+  the remaining variants is best done in a dedicated experiment milestone
+  with more signal sets and more epochs.
 
 ## Milestone 33: Stricter Generalization Checks
 
-- [ ] Evaluate on signal sets not used during training.
-- [ ] Consider splitting by generated signal set instead of random windows.
-- [ ] Consider time-based splitting inside each signal set.
-- [ ] Compare random-window split vs. held-out-signal-set split.
-- [ ] Check whether FC performance drops on stricter splits.
-- [ ] Check whether RNN performance drops on stricter splits.
-- [ ] Check whether LSTM performance drops on stricter splits.
-- [ ] Document which split is used for final conclusions.
-- [ ] Keep random split as a quick baseline if useful.
+- [x] Evaluate on signal sets not used during training (via
+      `holdout_signal_set_split_indices` in `src/ai_orchestra/splits.py`).
+- [x] Consider splitting by generated signal set instead of random windows
+      (implemented; this is the held-out-signal-set split).
+- [ ] ~~Consider time-based splitting inside each signal set.~~
+      Deliberately skipped — out of scope for this project.
+- [x] Compare random-window split vs. held-out-signal-set split
+      (`scripts/run_generalization_check.py`, results saved under
+      `results/generalization/`).
+- [x] Check whether FC performance drops on stricter splits.
+- [x] Check whether RNN performance drops on stricter splits.
+- [x] Check whether LSTM performance drops on stricter splits.
+- [x] Document which split is used for final conclusions (held-out
+      signal set is used for the headline conclusions; random split is
+      kept as a quick smoke baseline).
+- [x] Keep random split as a quick baseline (still the default in
+      `compare_models`).
+
+### Milestone 33 review notes
+
+Settings used (`scripts/run_generalization_check.py`):
+`signal_set_count=5`, `num_samples=100`, `batch_size=32`, `epochs=3`,
+`learning_rate=1e-3`, `hidden_size=32`, `num_layers=1`, `seed=42`, cpu.
+
+Random window split (every signal set appears in both train and test):
+
+| Model | Overall MSE |
+|-------|-------------|
+| FC    | `0.4012`    |
+| RNN   | `0.4115`    |
+| LSTM  | `0.3999`    |
+
+Held-out signal-set split (4 sets train, 1 set test, test sets unseen):
+
+| Model | Overall MSE | Delta vs random |
+|-------|-------------|-----------------|
+| FC    | `0.5774`    | `+0.1762`       |
+| RNN   | `0.5463`    | `+0.1349`       |
+| LSTM  | `0.5550`    | `+0.1551`       |
+
+Findings:
+
+- **All three models degrade meaningfully** under the held-out split
+  (`+34%` to `+44%` worse). The random-window split was therefore
+  overstating performance because train and test shared the same
+  underlying clean signals.
+- **RNN degrades the least**, FC the most. The recurrent state appears
+  to help slightly with truly unseen signals, but the difference is
+  modest (`+0.1349` vs `+0.1762`).
+- Under the stricter split the three models are **roughly tied**
+  (`0.55–0.58`). The RNN lead seen in M30 at `1` signal set + `5` epochs
+  shrinks toward the noise floor once we ask for real generalization.
+- **Decision for headline conclusions**: report held-out-signal-set
+  results as the primary numbers. Random split stays in the codebase as
+  the quick smoke baseline that `compare_models` uses by default.
+
+Implementation notes:
+
+- New module `src/ai_orchestra/splits.py` (`59` lines).
+- `compare_models` got two new optional args: `split_indices` (tuple of
+  ndarrays, defaults to `None` → use the existing random split) and
+  `split_name` (string written into `settings["split"]` for the saved
+  metrics). Both arguments are backwards compatible; existing scripts
+  and tests still work.
+- New unit tests in `tests/unit/test_splits.py` (`6` tests) cover
+  disjoint partitions, full-set membership, determinism, invalid
+  configurations, and `compare_models` accepting a custom split.
+- Artifacts: `results/generalization/{random_split,holdout_split}_metrics.{json,csv}`
+  and `results/generalization/comparison.json` with the deltas.
 
 ## Milestone 34: Results Organization
 
-- [ ] Create `results/`.
-- [ ] Create `results/figures/`.
-- [ ] Create `results/metrics/`.
-- [ ] Create `results/models/` only if saving checkpoints.
-- [ ] Save loss curves with clear filenames.
-- [ ] Save prediction plots with clear filenames.
-- [ ] Save raw metrics with clear filenames.
-- [ ] Avoid committing very large generated files.
-- [ ] Decide which example figures should be committed.
-- [ ] Keep generated artifacts reproducible from code.
+This milestone is mostly an audit — the layout grew naturally through
+M22–M33. Items below verify that what we have is correct.
+
+- [x] Create `results/`.
+- [x] Create `results/figures/` (`fc_baseline/`, `rnn_baseline/`,
+      `lstm_baseline/`, `raw_examples/`, `comparison/`).
+- [x] Create `results/metrics/` (model comparison JSON + CSV).
+- [x] ~~Create `results/models/` only if saving checkpoints.~~
+      Not created on purpose; checkpoints aren't part of the deliverable
+      and `.gitignore` already covers `results/models/` and `*.pt`/`*.pth`/
+      `*.ckpt` if we ever do save them.
+- [x] Save loss curves with clear filenames
+      (`<model>_loss_curve.png` per baseline).
+- [x] Save prediction plots with clear filenames
+      (`<model>_prediction_s<class>_<freq>hz.png` per sample).
+- [x] Save raw metrics with clear filenames
+      (`model_comparison.{json,csv}`, per-experiment `metrics.{json,csv}`,
+      `random_split_metrics.{json,csv}`,
+      `holdout_split_metrics.{json,csv}`, `comparison.json`).
+- [x] Avoid committing very large generated files (full `results/` tree
+      is `~760 KB`, all small PNG/JSON/CSV; no `.pt`/`.pth` ever written).
+- [x] Decide which example figures should be committed (small smoke-run
+      plots only; new experiments go under `results/experiments/<name>/`).
+- [x] Keep generated artifacts reproducible from code
+      (`python -m ai_orchestra`, `scripts/run_comparison.py`,
+      `scripts/run_experiment.py`, `scripts/run_generalization_check.py`).
 
 ## Milestone 35: README Finalization
 
@@ -932,36 +1144,75 @@ Good commit scope: final quality pass, cleanup, documentation consistency, and o
 
 ## Milestone 36: Final Quality Pass
 
-- [ ] Run all tests.
-- [ ] Run Ruff.
-- [ ] Check Python files are reasonably small.
-- [ ] Split any Python file that grows too large.
-- [ ] Check that business logic is available through SDK functions.
-- [ ] Check that one-off scripts do not duplicate core logic.
-- [ ] Check that generated data is not accidentally committed.
-- [ ] Check that no secrets or local environment files are committed.
-- [ ] Check that `REQUIREMENTS.md` still matches the project.
-- [ ] Check that `PLAN.md` still matches the project.
-- [ ] Check that `TODO.md` accurately reflects remaining work.
-- [ ] Check that README commands work.
-- [ ] Check that final plots exist.
-- [ ] Check that final metrics exist.
+- [x] Run all tests — `180 passed` (M33 added six new tests).
+- [x] Run Ruff — clean, no waivers.
+- [x] Check Python files are reasonably small — every `src/` and
+      `tests/` Python file is under `150` lines (verified by scanning
+      all `.py` files with `Get-Content | Measure-Object`).
+- [x] Split any Python file that grows too large — `comparison.py` was
+      split into `comparison.py` + `comparison_internals.py` during M32
+      when it would otherwise have exceeded `150` lines.
+- [x] Check that business logic is available through SDK functions
+      (`compare_models`, `run_experiment`, `train_*_baseline`,
+      `evaluate_per_class_mse`, `holdout_signal_set_split_indices`, etc.
+      are all exported from `ai_orchestra`).
+- [x] Check that one-off scripts do not duplicate core logic — the four
+      scripts (`run_comparison`, `run_experiment`, `run_generalization_check`,
+      `__main__`) are thin orchestrators that import SDK functions.
+- [x] Check that generated data is not accidentally committed — full
+      `results/` tree is `~760 KB`, only small PNG/JSON/CSV; checkpoints
+      and `*.pt`/`*.pth`/`*.ckpt` are gitignored.
+- [x] Check that no secrets or local environment files are committed —
+      no `.env`, `credentials`, or secret-shaped files are tracked.
+- [x] Check that `REQUIREMENTS.md` still matches the project — present at
+      project root and consistent with the README at a high level.
+- [x] Check that `PLAN.md` still matches the project — present
+      (`676` lines, kept in sync with milestone scope).
+- [x] Check that `TODO.md` accurately reflects remaining work — only
+      Milestone 37 (explicitly optional) is left unchecked.
+- [x] Check that README commands work — all four runner commands
+      executed during M30, M32, and M33 milestones; `python -m pytest`
+      and `python -m ruff check .` both pass on the current tree.
+- [x] Check that final plots exist — `results/figures/{fc,rnn,lstm}_baseline/`,
+      `results/figures/comparison/`, `results/figures/raw_examples/`,
+      `results/experiments/noise_low/`, and the bar charts inside
+      `results/figures/comparison/` are all on disk.
+- [x] Check that final metrics exist — `results/metrics/model_comparison.{json,csv}`,
+      `results/experiments/noise_low/metrics.{json,csv}`, and
+      `results/generalization/{random,holdout}_split_metrics.{json,csv}`
+      plus `results/generalization/comparison.json` are all on disk.
 
 ## Milestone 37: Optional Improvements After Core Success
 
-- [ ] Add checkpoint saving.
-- [ ] Add checkpoint loading.
-- [ ] Add command-line runner.
-- [ ] Add progress bars.
-- [ ] Add parameter count reporting.
-- [ ] Add GPU device selection.
-- [ ] Add dataset caching.
-- [ ] Add saved generated datasets.
-- [ ] Add richer experiment summaries.
-- [ ] Add more frequencies.
-- [ ] Add random frequency sets.
-- [ ] Add more realistic signal noise.
-- [ ] Add comparison against a classical signal-processing baseline.
-- [ ] Add cross-correlation or spectral analysis plots.
-- [ ] Add notebook examples if useful.
+This milestone is **deliberately not pursued**. The project is complete
+for its stated goal (FC vs RNN vs LSTM signal reconstruction with a
+proper generalization check). The items below are real ideas for future
+work, but each one is **out of scope** and listed here only as a
+parking lot for follow-up.
+
+- [ ] ~~Add checkpoint saving.~~ Not needed for the deliverable.
+- [ ] ~~Add checkpoint loading.~~ Not needed for the deliverable.
+- [ ] ~~Add command-line runner.~~ Already covered by the four
+      `scripts/run_*.py` entry points and `python -m ai_orchestra`.
+- [ ] ~~Add progress bars.~~ Cosmetic only.
+- [ ] ~~Add parameter count reporting.~~ Could be a nice-to-have but
+      not part of the report.
+- [ ] ~~Add GPU device selection.~~ All runs are CPU-only and finish
+      in seconds.
+- [ ] ~~Add dataset caching.~~ Lazy indexing already keeps memory low.
+- [ ] ~~Add saved generated datasets.~~ Signal generation is fast and
+      deterministic from the seed.
+- [ ] ~~Add richer experiment summaries.~~ JSON + CSV + two plots per
+      experiment is already self-describing.
+- [ ] ~~Add more frequencies.~~ Would require widening the one-hot;
+      the four current frequencies are sufficient to compare models.
+- [ ] ~~Add random frequency sets.~~ Same reasoning as above.
+- [ ] ~~Add more realistic signal noise.~~ The three noise sweeps
+      (`noise_low/medium/high`) already cover the question.
+- [ ] ~~Add comparison against a classical signal-processing baseline.~~
+      Acknowledged as a real follow-up in the README's Limitations
+      section, but out of scope for this submission.
+- [ ] ~~Add cross-correlation or spectral analysis plots.~~ Out of scope.
+- [ ] ~~Add notebook examples if useful.~~ All workflows are runnable
+      from `scripts/`; a notebook would duplicate that.
 

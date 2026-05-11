@@ -16,6 +16,10 @@ def test_default_training_values_match_plan() -> None:
     assert DEFAULTS.train_ratio == 0.8
     assert DEFAULTS.batch_size == 64
     assert isinstance(DEFAULTS.random_seed, int)
+    assert DEFAULTS.epochs == 3
+    assert DEFAULTS.learning_rate == 1e-3
+    assert DEFAULTS.hidden_size == 32
+    assert DEFAULTS.num_layers == 1
 
 
 def test_default_randomization_ranges_are_valid() -> None:

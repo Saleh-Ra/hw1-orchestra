@@ -1,7 +1,7 @@
 """Tools for conditioned sine-signal reconstruction experiments."""
 
 from .defaults import DEFAULTS, PipelineDefaults
-from .signal_sets import SignalSet, generate_signal_set
+from .signal_sets import SignalSet, generate_signal_set, generate_signal_sets
 
 __version__ = "0.1.0"
 
@@ -11,5 +11,6 @@ __all__ = [
     "SignalSet",
     "__version__",
     "generate_signal_set",
+    "generate_signal_sets",
 ]
 

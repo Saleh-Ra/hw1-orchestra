@@ -230,19 +230,28 @@ Milestone 8 validation:
 
 ## Milestone 9: Generate Many Signal Sets
 
-- [ ] Add a function to generate multiple random signal sets.
-- [ ] Use `50` signal sets as the first default.
-- [ ] Use a different seed stream per signal set.
-- [ ] Keep frequencies the same across sets for the first baseline.
-- [ ] Randomize amplitudes across sets.
-- [ ] Randomize phases across sets.
-- [ ] Randomize noise across sets.
-- [ ] Return signal sets in a list or stacked structure.
-- [ ] Test that the number of generated sets matches the request.
-- [ ] Test that different sets are not identical.
-- [ ] Test that generation is reproducible from the same base seed.
-- [ ] Keep memory usage reasonable.
-- [ ] Add a smaller test setting with only `2` or `3` signal sets.
+- [x] Add a function to generate multiple random signal sets.
+- [x] Use `50` signal sets as the first default.
+- [x] Use a different seed stream per signal set.
+- [x] Keep frequencies the same across sets for the first baseline.
+- [x] Randomize amplitudes across sets.
+- [x] Randomize phases across sets.
+- [x] Randomize noise across sets.
+- [x] Return signal sets in a list or stacked structure.
+- [x] Test that the number of generated sets matches the request.
+- [x] Test that different sets are not identical.
+- [x] Test that generation is reproducible from the same base seed.
+- [x] Keep memory usage reasonable.
+- [x] Add a smaller test setting with only `2` or `3` signal sets.
+
+Milestone 9 validation:
+
+- `generate_signal_sets()` returns a list of generated `SignalSet` objects.
+- The default count comes from `DEFAULTS.num_signal_sets`, currently `50`.
+- Each signal set uses a different seed from a reproducible base seed stream.
+- Frequencies stay fixed across sets while amplitudes, phases, and noise vary.
+- Unit tests use small `2` or `3` set configurations to keep memory and runtime low.
+- Local Python compilation and direct many-signal-set sanity checks pass.
 
 ## Milestone 10: Visualize Raw Signals Early
 

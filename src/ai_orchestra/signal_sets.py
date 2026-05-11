@@ -58,3 +58,25 @@ def generate_signal_set(
         clean_mix=combine_signals(clean_signals),
         noisy_mix=combine_signals(noisy_signals),
     )
+
+
+def generate_signal_sets(
+    defaults: PipelineDefaults = DEFAULTS,
+    count: int | None = None,
+    seed: int | None = None,
+) -> list[SignalSet]:
+    """Generate multiple signal sets with a reproducible per-set seed stream."""
+    defaults.validate()
+    signal_set_count = defaults.num_signal_sets if count is None else count
+    if signal_set_count <= 0:
+        msg = "Signal set count must be positive."
+        raise ValueError(msg)
+
+    rng = np.random.default_rng(seed)
+    seeds = rng.integers(
+        0,
+        np.iinfo(np.int64).max,
+        size=signal_set_count,
+        dtype=np.int64,
+    )
+    return [generate_signal_set(defaults, seed=int(set_seed)) for set_seed in seeds]

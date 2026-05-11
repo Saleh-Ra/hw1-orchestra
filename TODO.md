@@ -34,37 +34,42 @@ Milestone 0 decisions:
 
 ## Milestone 1: Minimal Project Setup
 
-- [ ] Inspect the current repository contents.
-- [ ] Create `pyproject.toml`.
-- [ ] Add the project name.
-- [ ] Add the project version.
-- [ ] Add the Python version requirement.
-- [ ] Add NumPy dependency.
-- [ ] Add PyTorch dependency.
-- [ ] Add Matplotlib dependency.
-- [ ] Add pytest development dependency.
-- [ ] Add Ruff development dependency.
+- [x] Inspect the current repository contents.
+- [x] Create `pyproject.toml`.
+- [x] Add the project name.
+- [x] Add the project version.
+- [x] Add the Python version requirement.
+- [x] Add NumPy dependency.
+- [x] Add PyTorch dependency.
+- [x] Add Matplotlib dependency.
+- [x] Add pytest development dependency.
+- [x] Add Ruff development dependency.
 - [ ] Generate or update `uv.lock`.
-- [ ] Create `src/`.
-- [ ] Create `src/ai_orchestra/`.
-- [ ] Create `src/ai_orchestra/__init__.py`.
-- [ ] Add a minimal package import test.
-- [ ] Create `tests/`.
-- [ ] Create `tests/unit/`.
-- [ ] Create `tests/integration/`.
-- [ ] Add a minimal smoke test.
-- [ ] Create `.gitignore` if missing.
-- [ ] Ignore `.venv/`.
-- [ ] Ignore `__pycache__/`.
-- [ ] Ignore `.pytest_cache/`.
-- [ ] Ignore `.ruff_cache/`.
-- [ ] Ignore large generated data files.
-- [ ] Ignore model checkpoint files.
-- [ ] Ignore temporary result files where appropriate.
+- [x] Create `src/`.
+- [x] Create `src/ai_orchestra/`.
+- [x] Create `src/ai_orchestra/__init__.py`.
+- [x] Add a minimal package import test.
+- [x] Create `tests/`.
+- [x] Create `tests/unit/`.
+- [x] Create `tests/integration/`.
+- [x] Add a minimal smoke test.
+- [x] Create `.gitignore` if missing.
+- [x] Ignore `.venv/`.
+- [x] Ignore `__pycache__/`.
+- [x] Ignore `.pytest_cache/`.
+- [x] Ignore `.ruff_cache/`.
+- [x] Ignore large generated data files.
+- [x] Ignore model checkpoint files.
+- [x] Ignore temporary result files where appropriate.
 - [ ] Run `uv run pytest`.
 - [ ] Run `uv run ruff check .`.
 - [ ] Fix setup issues until tests pass.
 - [ ] Fix setup issues until Ruff passes.
+
+Milestone 1 blocker:
+
+- `uv` is not installed or not on `PATH`, so `uv.lock`, `uv run pytest`, and `uv run ruff check .` are blocked for now.
+- Local Python imports the package successfully, and `pyproject.toml` parses successfully.
 
 ## Milestone 2: First Hardcoded Defaults
 

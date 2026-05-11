@@ -32,6 +32,19 @@ def generate_clean_signal(
     return amplitude * np.sin((2.0 * np.pi * frequency_hz * time_values) + phase)
 
 
+def sample_signal_parameters(
+    defaults: PipelineDefaults = DEFAULTS,
+    seed: int | None = None,
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
+    """Sample one amplitude and phase for each configured signal."""
+    defaults.validate()
+    rng = np.random.default_rng(seed)
+    signal_count = len(defaults.frequencies_hz)
+    amplitudes = rng.uniform(*defaults.amplitude_range, size=signal_count)
+    phases = rng.uniform(*defaults.phase_range, size=signal_count)
+    return amplitudes, phases
+
+
 def generate_clean_signals(
     defaults: PipelineDefaults = DEFAULTS,
     amplitudes: Sequence[float] | None = None,

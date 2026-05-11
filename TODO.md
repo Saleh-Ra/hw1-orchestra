@@ -144,16 +144,24 @@ Milestone 4 validation:
 
 ## Milestone 5: Add Random Amplitude And Phase
 
-- [ ] Add random amplitude sampling.
-- [ ] Add random phase sampling.
-- [ ] Keep phase values between `0` and `2pi`.
-- [ ] Use one random amplitude per signal per signal set.
-- [ ] Use one random phase per signal per signal set.
-- [ ] Make random generation seed-controlled.
-- [ ] Test that the same seed gives the same amplitudes.
-- [ ] Test that the same seed gives the same phases.
-- [ ] Test that a different seed changes at least one signal.
-- [ ] Keep the random logic simple and readable.
+- [x] Add random amplitude sampling.
+- [x] Add random phase sampling.
+- [x] Keep phase values between `0` and `2pi`.
+- [x] Use one random amplitude per signal per signal set.
+- [x] Use one random phase per signal per signal set.
+- [x] Make random generation seed-controlled.
+- [x] Test that the same seed gives the same amplitudes.
+- [x] Test that the same seed gives the same phases.
+- [x] Test that a different seed changes at least one signal.
+- [x] Keep the random logic simple and readable.
+
+Milestone 5 validation:
+
+- `sample_signal_parameters()` samples one amplitude and one phase per configured frequency.
+- The same seed reproduces the same amplitudes and phases.
+- Different seeds change at least one sampled parameter.
+- Sampled phases stay between `0` and `2pi`.
+- Local Python compilation and direct random-parameter sanity checks pass.
 
 ## Milestone 6: Generate Noisy Signal Versions
 

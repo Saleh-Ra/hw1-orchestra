@@ -30,3 +30,32 @@ def generate_clean_signal(
 
     time_values = np.asarray(time_axis, dtype=np.float64)
     return amplitude * np.sin((2.0 * np.pi * frequency_hz * time_values) + phase)
+
+
+def generate_clean_signals(
+    defaults: PipelineDefaults = DEFAULTS,
+    amplitudes: Sequence[float] | None = None,
+    phases: Sequence[float] | None = None,
+) -> NDArray[np.float64]:
+    """Generate the clean signal stack in the configured frequency order."""
+    defaults.validate()
+    time_axis = make_time_axis(defaults)
+    frequencies = defaults.frequencies_hz
+    signal_count = len(frequencies)
+    signal_amplitudes = amplitudes if amplitudes is not None else (1.0,) * signal_count
+    signal_phases = phases if phases is not None else (0.0,) * signal_count
+
+    if len(signal_amplitudes) != signal_count or len(signal_phases) != signal_count:
+        msg = "Amplitudes and phases must match the number of frequencies."
+        raise ValueError(msg)
+
+    signals = [
+        generate_clean_signal(frequency, time_axis, amplitude, phase)
+        for frequency, amplitude, phase in zip(
+            frequencies,
+            signal_amplitudes,
+            signal_phases,
+            strict=True,
+        )
+    ]
+    return np.stack(signals)

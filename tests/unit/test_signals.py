@@ -1,7 +1,11 @@
 import numpy as np
 
 from ai_orchestra import DEFAULTS
-from ai_orchestra.signals import generate_clean_signal, make_time_axis
+from ai_orchestra.signals import (
+    generate_clean_signal,
+    generate_clean_signals,
+    make_time_axis,
+)
 
 
 def test_time_axis_length_matches_default_sample_count() -> None:
@@ -67,3 +71,38 @@ def test_changing_amplitude_changes_signal_scale() -> None:
     larger_signal = generate_clean_signal(1.0, time_axis, amplitude=2.0, phase=0.0)
 
     assert np.allclose(larger_signal, base_signal * 2.0)
+
+
+def test_clean_signal_stack_shape_matches_default_frequencies() -> None:
+    signals = generate_clean_signals()
+
+    assert signals.shape == (len(DEFAULTS.frequencies_hz), DEFAULTS.num_samples)
+
+
+def test_clean_signal_stack_uses_frequency_order() -> None:
+    signals = generate_clean_signals()
+    time_axis = make_time_axis()
+
+    for index, frequency in enumerate(DEFAULTS.frequencies_hz):
+        expected_signal = generate_clean_signal(
+            frequency_hz=frequency,
+            time_axis=time_axis,
+            amplitude=1.0,
+            phase=0.0,
+        )
+        assert np.allclose(signals[index], expected_signal)
+
+
+def test_clean_signal_stack_contains_distinct_signals() -> None:
+    signals = generate_clean_signals()
+
+    assert not np.allclose(signals[0], signals[1])
+    assert not np.allclose(signals[1], signals[2])
+    assert not np.allclose(signals[2], signals[3])
+
+
+def test_clean_signal_stack_is_deterministic() -> None:
+    first = generate_clean_signals()
+    second = generate_clean_signals()
+
+    assert np.allclose(first, second)

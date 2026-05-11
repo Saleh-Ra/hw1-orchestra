@@ -187,15 +187,23 @@ Milestone 6 validation:
 
 ## Milestone 7: Combine Signals
 
-- [ ] Add a function to sum signals across the signal axis.
-- [ ] Create the clean mixed signal.
-- [ ] Create the noisy mixed signal.
-- [ ] Ensure clean mixed signal shape is `(10000,)`.
-- [ ] Ensure noisy mixed signal shape is `(10000,)`.
-- [ ] Test clean mixed signal equals the sum of clean signals.
-- [ ] Test noisy mixed signal equals the sum of noisy signals.
-- [ ] Test mixed signals contain finite values.
-- [ ] Test clean and noisy mixed signals are not identical when noise is enabled.
+- [x] Add a function to sum signals across the signal axis.
+- [x] Create the clean mixed signal.
+- [x] Create the noisy mixed signal.
+- [x] Ensure clean mixed signal shape is `(10000,)`.
+- [x] Ensure noisy mixed signal shape is `(10000,)`.
+- [x] Test clean mixed signal equals the sum of clean signals.
+- [x] Test noisy mixed signal equals the sum of noisy signals.
+- [x] Test mixed signals contain finite values.
+- [x] Test clean and noisy mixed signals are not identical when noise is enabled.
+
+Milestone 7 validation:
+
+- `combine_signals()` sums a `(signal_count, sample_count)` stack into one mixed signal.
+- Clean and noisy mixed signals both have shape `(10000,)`.
+- Mixed signals equal the sum across the signal axis.
+- Clean and noisy mixed signals differ when noise is enabled.
+- Local Python compilation and direct mixed-signal sanity checks pass.
 
 ## Milestone 8: Represent One Signal Set
 

@@ -116,3 +116,12 @@ def generate_noisy_signals(
         noisy_signals = noisy_signals + additive_noise
 
     return noisy_signals
+
+
+def combine_signals(signals: NDArray[np.float64]) -> NDArray[np.float64]:
+    """Sum a stack of signals into one mixed signal."""
+    signal_stack = np.asarray(signals, dtype=np.float64)
+    if signal_stack.ndim != 2:
+        msg = "Signals must be a 2D array shaped as (signal_count, sample_count)."
+        raise ValueError(msg)
+    return np.sum(signal_stack, axis=0)
